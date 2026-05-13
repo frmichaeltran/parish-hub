@@ -130,16 +130,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .cal-month{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-dow{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:4px 0 6px;}
-.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background 0.1s;}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background 0.1s;position:relative;}
 .cal-day:active{opacity:0.7;}
 .cal-day.empty{pointer-events:none;}
-.cal-day.today{font-weight:700;color:var(--purple);}
-.cal-day.has-intention{background:var(--purple);color:#fff;border-radius:8px;}
-.cal-day.today.has-intention{background:var(--purple);color:#fff;box-shadow:0 0 0 3px var(--purple-mid);}
-.cal-day.selected:not(.has-intention){background:var(--purple-light);color:var(--purple);}
+.cal-day.today{font-weight:700;}
+.cal-day.pending{background:#F59E0B;color:#fff;}
+.cal-day.done{background:#16A34A;color:#fff;}
+.cal-day.mixed{background:#3B82F6;color:#fff;}
+.cal-day.today.pending{box-shadow:0 0 0 3px #FCD34D;}
+.cal-day.today.done{box-shadow:0 0 0 3px #86EFAC;}
+.cal-day.today.mixed{box-shadow:0 0 0 3px #93C5FD;}
+.cal-day.today:not(.pending):not(.done):not(.mixed){color:var(--purple);font-weight:700;}
+.cal-day.selected:not(.pending):not(.done):not(.mixed){background:var(--purple-light);color:var(--purple);}
+.cal-day.selected.pending,.cal-day.selected.done,.cal-day.selected.mixed{box-shadow:0 0 0 3px #1a1a1a;}
 .cal-selected-label{font-size:13px;font-weight:500;color:var(--text);margin:12px 0 8px;}
-.cal-day-int{padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;}
+.cal-day-int{padding:10px 0;border-bottom:1px solid var(--border);}
 .cal-day-int:last-child{border-bottom:none;}
+.cal-int-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.cal-int-name{font-size:14px;font-weight:500;flex:1;}
+.cal-int-meta{font-size:12px;color:var(--muted);margin-bottom:8px;padding-left:22px;}
+.cal-int-actions{display:flex;gap:6px;padding-left:22px;}
+.int-btn{padding:6px 12px;border-radius:20px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.int-btn:active{opacity:0.75;}
+.btn-done{background:#DCFCE7;color:#16A34A;}
+.btn-done.offered{background:#16A34A;color:#fff;}
+.btn-move{background:var(--purple-light);color:var(--purple);}
+.btn-del{background:var(--red-light);color:var(--red);}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:50%;}
 
 /* TOAST */
 .toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9998;pointer-events:none;}
@@ -540,6 +559,16 @@ async function sheetsAppend(range,values){
   const tok=await getToken();
   await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{method:'POST',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'},body:JSON.stringify({values})});
 }
+async function sheetsUpdate(range,values){
+  const tok=await getToken();
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,{method:'PUT',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'},body:JSON.stringify({values})});
+}
+async function sheetsClearRow(sheetName,rowIndex){
+  // rowIndex is 1-based (row 1 = header, row 2 = first data row)
+  const tok=await getToken();
+  const range=`${sheetName}!A${rowIndex}:G${rowIndex}`;
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:clear`,{method:'POST',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'}});
+}
 
 // LOAD
 async function loadAll(){
@@ -552,7 +581,7 @@ async function loadAll(){
       sheetsGet('StoleFees!A2:F')
     ]);
     trips=(tr||[]).map(r=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'other',miles:parseFloat(r[4])||0,notes:r[6]||''})).reverse();
-    intentions=(it||[]).map(r=>({date:r[0]||'',time:r[1]||'',type:r[2]||'living',name:r[3]||'',requestor:r[4]||''})).reverse();
+    intentions=(it||[]).map((r,i)=>({date:r[0]||'',time:r[1]||'',type:r[2]||'living',name:r[3]||'',requestor:r[4]||'',status:r[5]||'pending',rowIndex:i+2})).reverse();
     reimbs=(re||[]).map(r=>({date:r[0]||'',desc:r[1]||'',category:r[2]||'other',amount:parseFloat(r[3])||0,status:r[4]||'pending',notes:r[5]||''})).reverse();
     stoles=(st||[]).map(r=>({date:r[0]||'',type:r[1]||'other',amount:parseFloat(r[2])||0,from:r[3]||'',notes:r[4]||''})).reverse();
     setSyncBadge('ok');
@@ -670,30 +699,51 @@ function exportMileageCSV(){
 }
 
 // CALENDAR
+function getDayStatus(date){
+  const dayInts=intentions.filter(i=>i.date===date);
+  if(!dayInts.length)return null;
+  const allDone=dayInts.every(i=>i.status==='done');
+  const noneDone=dayInts.every(i=>i.status!=='done');
+  if(allDone)return 'done';
+  if(noneDone)return 'pending';
+  return 'mixed';
+}
 function renderCalendar(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('cal-month').textContent=months[calMonth]+' '+calYear;
-  const intentionDates=new Set(intentions.map(i=>i.date));
   const firstDay=new Date(calYear,calMonth,1).getDay();
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   let html='';
   for(let i=0;i<firstDay;i++)html+=`<div class="cal-day empty"></div>`;
   for(let d=1;d<=daysInMonth;d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const status=getDayStatus(ds);
     let cls='cal-day';
     if(ds===TODAY)cls+=' today';
-    if(intentionDates.has(ds))cls+=' has-intention';
+    if(status)cls+=` ${status}`;
     if(ds===selectedCalDate)cls+=' selected';
     html+=`<div class="${cls}" onclick="selectCalDay('${ds}')">${d}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
+  // Legend
+  const legendHtml=`
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>Pending</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div>Offered</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>Mixed</div>
+    </div>`;
+  let legendEl=document.getElementById('cal-legend');
+  if(!legendEl){
+    const grid=document.getElementById('cal-days').parentElement;
+    const div=document.createElement('div');div.id='cal-legend';grid.after(div);legendEl=div;
+  }
+  legendEl.innerHTML=legendHtml;
   if(selectedCalDate)renderCalDayIntentions(selectedCalDate);
 }
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
 function selectCalDay(date){
   selectedCalDate=date;renderCalendar();
-  // Auto-fill the date in the add form
   document.getElementById('i-date').value=date;
 }
 function renderCalDayIntentions(date){
@@ -703,8 +753,71 @@ function renderCalDayIntentions(date){
   const d=new Date(date+'T00:00:00');
   label.style.display='block';
   label.textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  if(!dayInts.length){container.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0 8px;">No intentions for this day.</div>';return;}
-  container.innerHTML=dayInts.map(i=>`<div class="cal-day-int"><span style="font-size:14px;">${i.type==='deceased'?'†':'✓'}</span><div><div style="font-size:14px;font-weight:500;">${i.name}</div><div style="font-size:12px;color:var(--muted);">${i.time}${i.requestor?' · '+i.requestor:''}</div></div></div>`).join('');
+  if(!dayInts.length){
+    container.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0 8px;">No intentions for this day. Tap a date above to select it, then add below.</div>';
+    return;
+  }
+  container.innerHTML=dayInts.map((i,idx)=>{
+    const realIdx=intentions.indexOf(i);
+    const isDone=i.status==='done';
+    return `<div class="cal-day-int" id="cdi-${realIdx}">
+      <div class="cal-int-top">
+        <span style="font-size:15px;">${i.type==='deceased'?'✝':'✓'}</span>
+        <div class="cal-int-name" style="${isDone?'text-decoration:line-through;color:var(--muted);':''}">${i.name}</div>
+        ${isDone?'<span style="font-size:11px;background:#DCFCE7;color:#16A34A;padding:2px 8px;border-radius:20px;font-weight:500;">Offered ✓</span>':''}
+      </div>
+      <div class="cal-int-meta">${i.time}${i.requestor?' · Req. by '+i.requestor:''}</div>
+      <div class="cal-int-actions">
+        <button class="int-btn ${isDone?'btn-done offered':'btn-done'}" onclick="markDone(${realIdx})">${isDone?'✓ Offered':'Mark as offered'}</button>
+        <button class="int-btn btn-move" onclick="moveIntention(${realIdx})">📅 Move</button>
+        <button class="int-btn btn-del" onclick="deleteIntention(${realIdx})">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function markDone(idx){
+  const i=intentions[idx];
+  const newStatus=i.status==='done'?'pending':'done';
+  setSyncBadge('syncing');
+  try{
+    if(i.rowIndex>0){
+      await sheetsUpdate(`Intentions!F${i.rowIndex}`,[[ newStatus ]]);
+    }
+    intentions[idx].status=newStatus;
+    setSyncBadge('ok');toast(newStatus==='done'?'Marked as offered ✓':'Marked as pending');
+    renderCalendar();renderIntentions();updateHomeCards();
+  }catch(e){setSyncBadge('error');toast('Could not save','err');}
+}
+async function moveIntention(idx){
+  const i=intentions[idx];
+  const newDate=prompt('Move this intention to date (YYYY-MM-DD):',i.date);
+  if(!newDate||newDate===i.date)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate)){alert('Please use format YYYY-MM-DD (e.g. 2026-05-20)');return;}
+  setSyncBadge('syncing');
+  try{
+    if(i.rowIndex>0){
+      await sheetsUpdate(`Intentions!A${i.rowIndex}`,[[ newDate ]]);
+    }
+    intentions[idx].date=newDate;
+    setSyncBadge('ok');toast('Intention moved ✓');
+    selectedCalDate=newDate;
+    // navigate calendar to new date
+    const parts=newDate.split('-');
+    calYear=parseInt(parts[0]);calMonth=parseInt(parts[1])-1;
+    renderCalendar();renderIntentions();updateHomeCards();
+  }catch(e){setSyncBadge('error');toast('Could not save','err');}
+}
+async function deleteIntention(idx){
+  const i=intentions[idx];
+  if(!confirm(`Delete intention for "${i.name}"? This cannot be undone.`))return;
+  setSyncBadge('syncing');
+  try{
+    if(i.rowIndex>0) await sheetsClearRow('Intentions',i.rowIndex);
+    intentions.splice(idx,1);
+    setSyncBadge('ok');toast('Intention deleted');
+    renderCalendar();renderIntentions();updateHomeCards();
+    if(selectedCalDate)renderCalDayIntentions(selectedCalDate);
+  }catch(e){setSyncBadge('error');toast('Could not delete','err');}
 }
 
 // INTENTIONS
@@ -717,8 +830,8 @@ async function addIntention(){
   if(!date||!name){alert('Please enter a date and name.');return;}
   setSyncBadge('syncing');
   try{
-    await sheetsAppend('Intentions!A:F',[[date,time,type,name,requestor,'']]);
-    intentions.unshift({date,time,type,name,requestor});
+    await sheetsAppend('Intentions!A:F',[[date,time,type,name,requestor,'pending']]);
+    intentions.unshift({date,time,type,name,requestor,status:'pending',rowIndex:-1});
     document.getElementById('i-name').value='';document.getElementById('i-requestor').value='';
     setSyncBadge('ok');toast('Intention saved ✓');
     renderIntentions();renderCalendar();updateHomeCards();
