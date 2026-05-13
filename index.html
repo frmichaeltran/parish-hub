@@ -128,37 +128,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-nav{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
 .cal-month{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.cal-dow{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:4px 0 6px;}
-.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background 0.1s;position:relative;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:4px 0 8px;}
+.cal-day{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 2px;cursor:pointer;transition:background 0.1s;min-height:52px;gap:2px;}
 .cal-day:active{opacity:0.7;}
 .cal-day.empty{pointer-events:none;}
-.cal-day.today{font-weight:700;}
-.cal-day.pending{background:#F59E0B;color:#fff;}
-.cal-day.done{background:#16A34A;color:#fff;}
-.cal-day.mixed{background:#3B82F6;color:#fff;}
-.cal-day.today.pending{box-shadow:0 0 0 3px #FCD34D;}
-.cal-day.today.done{box-shadow:0 0 0 3px #86EFAC;}
-.cal-day.today.mixed{box-shadow:0 0 0 3px #93C5FD;}
-.cal-day.today:not(.pending):not(.done):not(.mixed){color:var(--purple);font-weight:700;}
-.cal-day.selected:not(.pending):not(.done):not(.mixed){background:var(--purple-light);color:var(--purple);}
-.cal-day.selected.pending,.cal-day.selected.done,.cal-day.selected.mixed{box-shadow:0 0 0 3px #1a1a1a;}
-.cal-selected-label{font-size:13px;font-weight:500;color:var(--text);margin:12px 0 8px;}
+.cal-day.today .cal-num{color:var(--purple);font-weight:700;}
+.cal-day.today{background:var(--purple-light);}
+.cal-day.selected{box-shadow:0 0 0 2px var(--purple);}
+.cal-day.selected.today{box-shadow:0 0 0 2px var(--purple);}
+.cal-num{font-size:17px;font-weight:500;color:var(--text);line-height:1;}
+.cal-sym{font-size:13px;line-height:1;}
+.cal-selected-label{font-size:13px;font-weight:500;color:var(--text);margin:4px 0 10px;}
 .cal-day-int{padding:10px 0;border-bottom:1px solid var(--border);}
 .cal-day-int:last-child{border-bottom:none;}
 .cal-int-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .cal-int-name{font-size:14px;font-weight:500;flex:1;}
 .cal-int-meta{font-size:12px;color:var(--muted);margin-bottom:8px;padding-left:22px;}
-.cal-int-actions{display:flex;gap:6px;padding-left:22px;}
-.int-btn{padding:6px 12px;border-radius:20px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.cal-int-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.int-btn{padding:8px 14px;border-radius:20px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
 .int-btn:active{opacity:0.75;}
 .btn-done{background:#DCFCE7;color:#16A34A;}
 .btn-done.offered{background:#16A34A;color:#fff;}
 .btn-move{background:var(--purple-light);color:var(--purple);}
 .btn-del{background:var(--red-light);color:var(--red);}
-.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
-.legend-dot{width:10px;height:10px;border-radius:50%;}
 
 /* TOAST */
 .toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9998;pointer-events:none;}
@@ -702,11 +695,7 @@ function exportMileageCSV(){
 function getDayStatus(date){
   const dayInts=intentions.filter(i=>i.date===date);
   if(!dayInts.length)return null;
-  const allDone=dayInts.every(i=>i.status==='done');
-  const noneDone=dayInts.every(i=>i.status!=='done');
-  if(allDone)return 'done';
-  if(noneDone)return 'pending';
-  return 'mixed';
+  return dayInts.every(i=>i.status==='done')?'done':'pending';
 }
 function renderCalendar(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -720,24 +709,13 @@ function renderCalendar(){
     const status=getDayStatus(ds);
     let cls='cal-day';
     if(ds===TODAY)cls+=' today';
-    if(status)cls+=` ${status}`;
     if(ds===selectedCalDate)cls+=' selected';
-    html+=`<div class="${cls}" onclick="selectCalDay('${ds}')">${d}</div>`;
+    let sym='';
+    if(status==='pending')sym=`<span class="cal-sym">🕯️</span>`;
+    else if(status==='done')sym=`<span class="cal-sym" style="color:#16A34A;font-size:14px;font-weight:700;">✓</span>`;
+    html+=`<div class="${cls}" onclick="selectCalDay('${ds}')"><span class="cal-num">${d}</span>${sym}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
-  // Legend
-  const legendHtml=`
-    <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>Pending</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div>Offered</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>Mixed</div>
-    </div>`;
-  let legendEl=document.getElementById('cal-legend');
-  if(!legendEl){
-    const grid=document.getElementById('cal-days').parentElement;
-    const div=document.createElement('div');div.id='cal-legend';grid.after(div);legendEl=div;
-  }
-  legendEl.innerHTML=legendHtml;
   if(selectedCalDate)renderCalDayIntentions(selectedCalDate);
 }
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
