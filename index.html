@@ -3,221 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Fr Michael — Parish Hub</title>
+<title>Parish Hub</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+:root {
+  --purple:#534AB7;--purple-light:#EEEDFE;--purple-mid:#AFA9EC;
+  --teal:#0F6E56;--teal-light:#E1F5EE;
+  --amber:#854F0B;--amber-light:#FAEEDA;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --blue:#0C447C;--blue-light:#E6F1FB;
+  --bg:#F7F6F3;--card:#FFFFFF;--text:#1a1a1a;--muted:#6b6b6b;
+  --border:rgba(0,0,0,0.08);--radius:14px;--radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-  /* PIN LOCK */
-  #pin-screen {
-    position: fixed; inset: 0; z-index: 9999;
-    background: #1a1433;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 2rem;
-    font-family: 'DM Sans', sans-serif;
-  }
-  #pin-screen.hidden { display: none; }
-  .pin-cross { font-size: 40px; margin-bottom: 8px; }
-  .pin-title { font-family: 'Lora', serif; font-size: 22px; color: #fff; font-weight: 600; margin-bottom: 4px; }
-  .pin-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 40px; }
-  .pin-dots { display: flex; gap: 16px; margin-bottom: 40px; }
-  .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: transparent; transition: background 0.15s, border-color 0.15s; }
-  .pin-dot.filled { background: #fff; border-color: #fff; }
-  .pin-dot.error { background: #E24B4A; border-color: #E24B4A; }
-  .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 280px; }
-  .pin-btn {
-    aspect-ratio: 1; border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.1); color: #fff;
-    font-size: 22px; font-weight: 500; cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.1s, transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .pin-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.93); }
-  .pin-btn.empty { background: transparent; pointer-events: none; }
-  .pin-btn.del { font-size: 18px; }
-  .pin-error { font-size: 13px; color: #F09595; margin-top: 24px; min-height: 20px; text-align: center; }
-  .pin-locked { font-size: 13px; color: #FAC775; margin-top: 24px; text-align: center; }
+/* PIN */
+#pin-screen{position:fixed;inset:0;z-index:9999;background:#1a1433;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+#pin-screen.hidden{display:none;}
+.pin-cross{font-size:44px;margin-bottom:8px;}
+.pin-title{font-family:'Lora',serif;font-size:24px;color:#fff;font-weight:600;margin-bottom:4px;}
+.pin-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:44px;}
+.pin-dots{display:flex;gap:16px;margin-bottom:44px;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:transparent;transition:all 0.15s;}
+.pin-dot.filled{background:#fff;border-color:#fff;}
+.pin-dot.error{background:#E24B4A;border-color:#E24B4A;}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:280px;}
+.pin-btn{aspect-ratio:1;border-radius:50%;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:22px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;transition:all 0.1s;}
+.pin-btn:active{background:rgba(255,255,255,0.25);transform:scale(0.93);}
+.pin-btn.empty{background:transparent;pointer-events:none;}
+.pin-error{font-size:13px;color:#F09595;margin-top:24px;min-height:20px;text-align:center;}
+.pin-locked{font-size:13px;color:#FAC775;margin-top:24px;text-align:center;}
 
-  :root {
-    --purple: #534AB7;
-    --purple-light: #EEEDFE;
-    --purple-mid: #AFA9EC;
-    --teal: #0F6E56;
-    --teal-light: #E1F5EE;
-    --amber: #854F0B;
-    --amber-light: #FAEEDA;
-    --red-light: #FCEBEB;
-    --red: #A32D2D;
-    --bg: #F7F6F3;
-    --card: #FFFFFF;
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --border: rgba(0,0,0,0.08);
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
+/* APP */
+#app{display:none;}
+#app.visible{display:block;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* HOME */
+#page-home{min-height:100vh;}
+.home-header{padding:52px 24px 28px;background:linear-gradient(160deg,#1a1433 0%,#2d2660 100%);}
+.home-cross{font-size:28px;margin-bottom:6px;}
+.home-title{font-family:'Lora',serif;font-size:26px;color:#fff;font-weight:600;line-height:1.2;}
+.home-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px;}
+.home-date{font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:24px 16px 16px;}
+.home-btn{background:var(--card);border-radius:18px;border:1px solid var(--border);padding:22px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.home-btn:active{transform:scale(0.96);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.home-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.home-btn-title{font-size:15px;font-weight:500;color:var(--text);line-height:1.2;}
+.home-btn-sub{font-size:11px;color:var(--muted);}
+.icon-mileage{background:#EEF0FE;}
+.icon-intentions{background:#FEF3E8;}
+.icon-stole{background:#E8F7F2;}
+.icon-reimb{background:#FEE8E8;}
+.sync-row{display:flex;align-items:center;justify-content:center;padding:8px 16px 24px;}
+.sync-pill{font-size:11px;padding:5px 14px;border-radius:20px;background:var(--teal-light);color:var(--teal);font-weight:500;}
+.sync-pill.syncing{background:var(--amber-light);color:var(--amber);}
+.sync-pill.error{background:var(--red-light);color:var(--red);}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 90px;
-  }
+/* INNER PAGES */
+.inner-page{display:none;min-height:100vh;padding-bottom:40px;}
+.inner-page.active{display:block;}
+.page-topbar{display:flex;align-items:center;gap:12px;padding:16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;}
+.page-topbar-title{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);}
+.page-content{padding:16px;}
 
-  /* TOP BAR */
-  .topbar {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar-inner { display: flex; align-items: center; justify-content: space-between; }
-  .app-name { font-family: 'Lora', serif; font-size: 18px; font-weight: 600; color: var(--text); }
-  .app-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-  .sync-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--teal-light); color: var(--teal); font-weight: 500; display: flex; align-items: center; gap: 4px; }
-  .sync-badge.syncing { background: var(--amber-light); color: var(--amber); }
-  .sync-badge.error { background: var(--red-light); color: var(--red); }
+/* METRICS */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.metric{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.metric-val{font-size:22px;font-weight:500;color:var(--text);font-family:'Lora',serif;}
+.metric-sub{font-size:10px;color:var(--muted);margin-top:2px;}
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 8px 0 20px;
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 4px; cursor: pointer; border: none; background: none;
-    color: var(--text-muted); font-family: 'DM Sans', sans-serif;
-  }
-  .nav-item.active { color: var(--purple); }
-  .nav-icon { font-size: 22px; line-height: 1; }
-  .nav-label { font-size: 10px; font-weight: 500; }
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px;margin-bottom:12px;}
+.card-title{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;}
 
-  /* PAGES */
-  .page { display: none; padding: 16px; }
-  .page.active { display: block; }
+/* FORM */
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;}
+.field input,.field select{width:100%;padding:13px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:16px;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--purple-mid);background:#fff;}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{width:100%;padding:15px;border-radius:var(--radius-sm);border:none;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;}
+.btn:active{opacity:0.75;}
+.btn-primary{background:var(--purple);color:#fff;margin-bottom:8px;}
+.btn-secondary{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+.btn-calc{padding:13px 14px;border-radius:var(--radius-sm);border:1px solid var(--purple-mid);background:var(--purple-light);color:var(--purple);font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;flex-shrink:0;}
+.btn-calc:disabled{opacity:0.5;pointer-events:none;}
+.miles-calc-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:12px;}
+.miles-calc-row .field{flex:1;margin-bottom:0;}
+.base-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.base-edit{font-size:13px;color:var(--purple);background:none;border:none;cursor:pointer;padding:4px 8px;flex-shrink:0;font-family:'DM Sans',sans-serif;}
+.dist-info{background:var(--purple-light);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--purple);margin-bottom:12px;display:none;}
+.note{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;}
+.filter-row::-webkit-scrollbar{display:none;}
+.fbtn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:500;flex-shrink:0;}
+.fbtn.active{background:var(--purple-light);border-color:var(--purple-mid);color:var(--purple);}
 
-  /* METRICS */
-  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .metric { background: var(--card); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border); }
-  .metric-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-  .metric-val { font-size: 22px; font-weight: 500; color: var(--text); font-family: 'Lora', serif; }
-  .metric-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+/* ITEMS */
+.trip-item,.int-item,.reimb-item,.stole-item{padding:12px 0;border-bottom:1px solid var(--border);}
+.trip-item:last-child,.int-item:last-child,.reimb-item:last-child,.stole-item:last-child{border-bottom:none;}
+.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.item-title{font-size:14px;font-weight:500;line-height:1.3;flex:1;}
+.item-amount{font-size:14px;font-weight:500;color:var(--teal);white-space:nowrap;}
+.item-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.item-date{font-size:12px;color:var(--muted);}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.b-pastoral{background:var(--purple-light);color:var(--purple);}
+.b-hospital{background:var(--amber-light);color:var(--amber);}
+.b-school{background:var(--blue-light);color:var(--blue);}
+.b-admin{background:var(--teal-light);color:var(--teal);}
+.b-other{background:#F1EFE8;color:#444;}
+.b-living{background:var(--teal-light);color:var(--teal);}
+.b-deceased{background:#F1EFE8;color:#555;}
+.status-pending{background:var(--amber-light);color:var(--amber);}
+.status-approved{background:var(--teal-light);color:var(--teal);}
+.empty{text-align:center;padding:32px 0;color:var(--muted);font-size:14px;}
 
-  /* CARDS */
-  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
-  .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.cal-month{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:4px 0 6px;}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:background 0.1s;}
+.cal-day:active{opacity:0.7;}
+.cal-day.empty{pointer-events:none;}
+.cal-day.today{font-weight:700;color:var(--purple);}
+.cal-day.has-intention{background:var(--purple);color:#fff;border-radius:8px;}
+.cal-day.today.has-intention{background:var(--purple);color:#fff;box-shadow:0 0 0 3px var(--purple-mid);}
+.cal-day.selected:not(.has-intention){background:var(--purple-light);color:var(--purple);}
+.cal-selected-label{font-size:13px;font-weight:500;color:var(--text);margin:12px 0 8px;}
+.cal-day-int{padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;}
+.cal-day-int:last-child{border-bottom:none;}
 
-  /* FORM */
-  .field { margin-bottom: 12px; }
-  .field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 13px 14px; border-radius: var(--radius-sm);
-    border: 1px solid var(--border); font-size: 16px;
-    background: var(--bg); color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    -webkit-appearance: none; appearance: none;
-    outline: none;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: var(--purple-mid); background: #fff;
-  }
-  .field select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-  }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  /* BUTTONS */
-  .btn { width: 100%; padding: 15px; border-radius: var(--radius-sm); border: none; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
-  .btn:active { opacity: 0.75; }
-  .btn-primary { background: var(--purple); color: #fff; margin-bottom: 8px; }
-  .btn-secondary { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
-  .btn-calc { padding: 13px 14px; border-radius: var(--radius-sm); border: 1px solid var(--purple-mid); background: var(--purple-light); color: var(--purple); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
-  .btn-calc:disabled { opacity: 0.5; pointer-events: none; }
-
-  /* TRIP ITEMS */
-  .trip-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .trip-item:last-child { border-bottom: none; }
-  .trip-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
-  .trip-route { font-size: 14px; font-weight: 500; line-height: 1.3; flex: 1; }
-  .trip-amount { font-size: 14px; font-weight: 500; color: var(--teal); white-space: nowrap; }
-  .trip-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .trip-date { font-size: 12px; color: var(--text-muted); }
-  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .b-pastoral { background: var(--purple-light); color: var(--purple); }
-  .b-hospital { background: var(--amber-light); color: var(--amber); }
-  .b-school { background: #E6F1FB; color: #0C447C; }
-  .b-admin { background: var(--teal-light); color: var(--teal); }
-  .b-other { background: #F1EFE8; color: #444; }
-  .del-btn { background: none; border: none; cursor: pointer; color: #ccc; padding: 4px; min-width: 32px; min-height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .del-btn:active { color: var(--red); }
-
-  /* INTENTION ITEMS */
-  .int-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .int-item:last-child { border-bottom: none; }
-  .int-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .int-name { font-size: 14px; font-weight: 500; line-height: 1.3; flex: 1; }
-  .int-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-  .deceased { color: var(--text-muted); font-style: italic; }
-
-  /* REIMB ITEMS */
-  .reimb-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .reimb-item:last-child { border-bottom: none; }
-  .reimb-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .reimb-desc { font-size: 14px; font-weight: 500; flex: 1; }
-  .reimb-amt { font-size: 14px; font-weight: 500; color: var(--teal); white-space: nowrap; }
-  .reimb-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-  .status-pending { background: var(--amber-light); color: var(--amber); }
-  .status-approved { background: var(--teal-light); color: var(--teal); }
-
-  /* MISC */
-  .empty { text-align: center; padding: 32px 0; color: var(--text-muted); font-size: 14px; }
-  .dist-info { background: var(--purple-light); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--purple); margin-bottom: 12px; display: none; }
-  .base-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
-  .base-val { font-size: 13px; flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .base-edit { font-size: 13px; color: var(--purple); background: none; border: none; cursor: pointer; padding: 4px 8px; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
-  .note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; line-height: 1.5; }
-  .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
-  .filter-row::-webkit-scrollbar { display: none; }
-  .fbtn { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); font-size: 12px; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; font-weight: 500; flex-shrink: 0; }
-  .fbtn.active { background: var(--purple-light); border-color: var(--purple-mid); color: var(--purple); }
-  .section-hd { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .today-date { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .miles-calc-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
-  .miles-calc-row .field { flex: 1; margin-bottom: 0; }
-
-  /* TOAST */
-  .toast-wrap { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 999; pointer-events: none; }
-  .toast { padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 500; white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
-  .toast.show { opacity: 1; }
-  .toast-ok { background: #1a1a1a; color: #fff; }
-  .toast-err { background: var(--red); color: #fff; }
+/* TOAST */
+.toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9998;pointer-events:none;}
+.toast{padding:10px 18px;border-radius:30px;font-size:13px;font-weight:500;white-space:nowrap;opacity:0;transition:opacity 0.3s;}
+.toast.show{opacity:1;}
+.toast-ok{background:#1a1a1a;color:#fff;}
+.toast-err{background:var(--red);color:#fff;}
 </style>
 </head>
 <body>
 
-<!-- PIN LOCK SCREEN -->
+<!-- PIN -->
 <div id="pin-screen">
   <div class="pin-cross">✝</div>
   <div class="pin-title">Parish Hub</div>
   <div class="pin-sub">Fr Michael's admin assistant</div>
   <div class="pin-dots">
-    <div class="pin-dot" id="pd0"></div>
-    <div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div>
-    <div class="pin-dot" id="pd3"></div>
+    <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
   </div>
   <div class="pin-pad">
     <button class="pin-btn" onclick="pinPress('1')">1</button>
@@ -231,394 +172,454 @@
     <button class="pin-btn" onclick="pinPress('9')">9</button>
     <button class="pin-btn empty"></button>
     <button class="pin-btn" onclick="pinPress('0')">0</button>
-    <button class="pin-btn del" onclick="pinDel()">⌫</button>
+    <button class="pin-btn" onclick="pinDel()">⌫</button>
   </div>
   <div class="pin-error" id="pin-error"></div>
   <div class="pin-locked" id="pin-locked"></div>
 </div>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <div>
-      <div class="app-name">Parish Hub</div>
-      <div class="app-sub">Fr Michael's admin assistant</div>
+<!-- APP -->
+<div id="app">
+  <div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+  <!-- HOME -->
+  <div id="page-home">
+    <div class="home-header">
+      <div class="home-cross">✝</div>
+      <div class="home-title">Parish Hub</div>
+      <div class="home-sub">Fr Michael's admin assistant</div>
+      <div class="home-date" id="home-date"></div>
     </div>
-    <div class="sync-badge" id="sync-badge">&#10003; Synced</div>
+    <div class="home-grid">
+      <div class="home-btn" onclick="openPage('mileage')">
+        <div class="home-icon icon-mileage">🚗</div>
+        <div class="home-btn-title">Mileage</div>
+        <div class="home-btn-sub" id="hb-mileage">Tax deductions</div>
+      </div>
+      <div class="home-btn" onclick="openPage('intentions')">
+        <div class="home-icon icon-intentions">🕯️</div>
+        <div class="home-btn-title">Mass intentions</div>
+        <div class="home-btn-sub" id="hb-intentions">Daily calendar</div>
+      </div>
+      <div class="home-btn" onclick="openPage('stole')">
+        <div class="home-icon icon-stole">💵</div>
+        <div class="home-btn-title">Stole fees</div>
+        <div class="home-btn-sub" id="hb-stole">Outside income</div>
+      </div>
+      <div class="home-btn" onclick="openPage('reimb')">
+        <div class="home-icon icon-reimb">🧾</div>
+        <div class="home-btn-title">Reimbursements</div>
+        <div class="home-btn-sub" id="hb-reimb">Expense tracking</div>
+      </div>
+    </div>
+    <div class="sync-row">
+      <div class="sync-pill" id="sync-badge">✓ Synced with Google Sheets</div>
+    </div>
+  </div>
+
+  <!-- MILEAGE -->
+  <div class="inner-page" id="page-mileage">
+    <div class="page-topbar">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="page-topbar-title">🚗 Mileage</div>
+    </div>
+    <div class="page-content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Miles this year</div><div class="metric-val" id="m-miles">—</div><div class="metric-sub">total logged</div></div>
+        <div class="metric"><div class="metric-label">Claimable</div><div class="metric-val" id="m-amt">—</div><div class="metric-sub">@ $0.70/mile</div></div>
+        <div class="metric"><div class="metric-label">Trips</div><div class="metric-val" id="m-trips">—</div><div class="metric-sub">logged</div></div>
+        <div class="metric"><div class="metric-label">Top purpose</div><div class="metric-val" id="m-top" style="font-size:15px;padding-top:4px;">—</div><div class="metric-sub">by miles</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Log a trip</div>
+        <div class="base-row">
+          <span>🏠</span>
+          <select id="base-select" onchange="selectBase()" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-size:14px;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23888%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;"></select>
+          <button class="base-edit" onclick="editAddresses()">✎ Edit</button>
+        </div>
+        <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
+        <div class="field"><label>Purpose</label>
+          <select id="f-purpose">
+            <option value="pastoral">Pastoral visit</option>
+            <option value="hospital">Hospital / sick call</option>
+            <option value="school">School visit</option>
+            <option value="admin">Admin / deanery</option>
+            <option value="other">Other ministry</option>
+          </select>
+        </div>
+        <div class="field"><label>Destination address</label><input type="text" id="f-to" placeholder="e.g. 123 Main St, Denver, CO"/></div>
+        <div id="dist-info" class="dist-info"></div>
+        <div class="miles-calc-row">
+          <div class="field"><label>Miles (round trip)</label><input type="number" id="f-miles" placeholder="or enter manually" min="0" step="0.1" inputmode="decimal"/></div>
+          <button class="btn-calc" id="calc-btn" onclick="calcDistance()">📍 Calculate</button>
+        </div>
+        <div class="field"><label>Notes (optional)</label><input type="text" id="f-notes" placeholder="e.g. Anointing of the sick"/></div>
+        <button class="btn btn-primary" onclick="addTrip()">+ Add trip</button>
+        <button class="btn btn-secondary" onclick="exportMileageCSV()">↓ Export CSV for tax return</button>
+        <div class="note">IRS rate 2025: $0.70/mile · Round trip · Saved to Google Sheets</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Trip log</div>
+        <div class="filter-row">
+          <button class="fbtn active" onclick="setMileFilter('all',this)">All</button>
+          <button class="fbtn" onclick="setMileFilter('pastoral',this)">Pastoral</button>
+          <button class="fbtn" onclick="setMileFilter('hospital',this)">Hospital</button>
+          <button class="fbtn" onclick="setMileFilter('school',this)">School</button>
+          <button class="fbtn" onclick="setMileFilter('admin',this)">Admin</button>
+          <button class="fbtn" onclick="setMileFilter('other',this)">Other</button>
+        </div>
+        <div id="trip-log"><div class="empty">Loading trips…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTENTIONS -->
+  <div class="inner-page" id="page-intentions">
+    <div class="page-topbar">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="page-topbar-title">🕯️ Mass intentions</div>
+    </div>
+    <div class="page-content">
+      <div class="card">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calPrev()">‹</button>
+          <div class="cal-month" id="cal-month"></div>
+          <button class="cal-nav" onclick="calNext()">›</button>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow">Su</div><div class="cal-dow">Mo</div><div class="cal-dow">Tu</div>
+          <div class="cal-dow">We</div><div class="cal-dow">Th</div><div class="cal-dow">Fr</div><div class="cal-dow">Sa</div>
+          <div id="cal-days" style="display:contents;"></div>
+        </div>
+        <div class="cal-selected-label" id="cal-selected-label" style="display:none;"></div>
+        <div id="cal-day-intentions"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Add intention</div>
+        <div class="field"><label>Date of Mass</label><input type="date" id="i-date"/></div>
+        <div class="row2">
+          <div class="field"><label>Mass time</label>
+            <select id="i-time">
+              <option>7:00 AM</option><option>9:00 AM</option><option>10:00 AM</option>
+              <option>12:00 PM</option><option>6:00 PM</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field"><label>Living or deceased</label>
+            <select id="i-type"><option value="living">Living</option><option value="deceased">Deceased †</option></select>
+          </div>
+        </div>
+        <div class="field"><label>Name(s)</label><input type="text" id="i-name" placeholder="e.g. Margaret O'Brien"/></div>
+        <div class="field"><label>Requested by</label><input type="text" id="i-requestor" placeholder="e.g. The O'Brien family"/></div>
+        <button class="btn btn-primary" onclick="addIntention()">+ Add intention</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Intentions list</div>
+        <div class="filter-row">
+          <button class="fbtn active" onclick="setIntFilter('upcoming',this)">Upcoming</button>
+          <button class="fbtn" onclick="setIntFilter('today',this)">Today</button>
+          <button class="fbtn" onclick="setIntFilter('all',this)">All</button>
+        </div>
+        <div id="int-log"><div class="empty">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOLE FEES -->
+  <div class="inner-page" id="page-stole">
+    <div class="page-topbar">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="page-topbar-title">💵 Stole fees</div>
+    </div>
+    <div class="page-content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Total this year</div><div class="metric-val" id="s-total">—</div><div class="metric-sub">all fees</div></div>
+        <div class="metric"><div class="metric-label">This month</div><div class="metric-val" id="s-month">—</div><div class="metric-sub">current month</div></div>
+        <div class="metric"><div class="metric-label">Entries</div><div class="metric-val" id="s-count">—</div><div class="metric-sub">this year</div></div>
+        <div class="metric"><div class="metric-label">Top category</div><div class="metric-val" id="s-top" style="font-size:14px;padding-top:4px;">—</div><div class="metric-sub">by amount</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Record stole fee</div>
+        <div class="field"><label>Type</label>
+          <select id="s-type">
+            <option value="wedding">Wedding</option>
+            <option value="funeral">Funeral</option>
+            <option value="baptism">Baptism</option>
+            <option value="stipend">Mass stipend</option>
+            <option value="blessing">Blessing / other</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Amount ($)</label><input type="number" id="s-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
+          <div class="field"><label>Date</label><input type="date" id="s-date"/></div>
+        </div>
+        <div class="field"><label>From / occasion</label><input type="text" id="s-from" placeholder="e.g. Smith wedding"/></div>
+        <div class="field"><label>Notes (optional)</label><input type="text" id="s-notes" placeholder="e.g. Cash received"/></div>
+        <button class="btn btn-primary" onclick="addStole()">+ Record fee</button>
+        <button class="btn btn-secondary" onclick="exportStoleCSV()">↓ Export CSV for tax return</button>
+        <div class="note">All stole fees are reportable income — keep this for your tax return</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Fee log</div>
+        <div class="filter-row">
+          <button class="fbtn active" onclick="setStoleFilter('all',this)">All</button>
+          <button class="fbtn" onclick="setStoleFilter('wedding',this)">Weddings</button>
+          <button class="fbtn" onclick="setStoleFilter('funeral',this)">Funerals</button>
+          <button class="fbtn" onclick="setStoleFilter('baptism',this)">Baptisms</button>
+          <button class="fbtn" onclick="setStoleFilter('stipend',this)">Stipends</button>
+          <button class="fbtn" onclick="setStoleFilter('blessing',this)">Other</button>
+        </div>
+        <div id="stole-log"><div class="empty">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REIMBURSEMENTS -->
+  <div class="inner-page" id="page-reimb">
+    <div class="page-topbar">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="page-topbar-title">🧾 Reimbursements</div>
+    </div>
+    <div class="page-content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Pending</div><div class="metric-val" id="r-pending">—</div><div class="metric-sub">awaiting approval</div></div>
+        <div class="metric"><div class="metric-label">Approved YTD</div><div class="metric-val" id="r-approved">—</div><div class="metric-sub">this year</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">New reimbursement</div>
+        <div class="field"><label>Description</label><input type="text" id="r-desc" placeholder="e.g. Altar candles"/></div>
+        <div class="row2">
+          <div class="field"><label>Amount ($)</label><input type="number" id="r-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
+          <div class="field"><label>Date</label><input type="date" id="r-date"/></div>
+        </div>
+        <div class="field"><label>Category</label>
+          <select id="r-cat">
+            <option value="liturgical">Liturgical supplies</option>
+            <option value="travel">Travel</option>
+            <option value="office">Office / admin</option>
+            <option value="pastoral">Pastoral care</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Notes (optional)</label><input type="text" id="r-notes" placeholder="e.g. Receipt attached"/></div>
+        <button class="btn btn-primary" onclick="addReimb()">+ Submit reimbursement</button>
+        <button class="btn btn-secondary" onclick="exportReimbCSV()">↓ Export CSV</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Reimbursement log</div>
+        <div id="reimb-log"><div class="empty">Loading…</div></div>
+      </div>
+    </div>
   </div>
 </div>
-
-<div class="toast-wrap"><div class="toast" id="toast"></div></div>
-
-<!-- MILEAGE PAGE -->
-<div class="page active" id="page-mileage">
-  <div class="metrics">
-    <div class="metric">
-      <div class="metric-label">Miles this year</div>
-      <div class="metric-val" id="m-miles">—</div>
-      <div class="metric-sub">total logged</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Claimable</div>
-      <div class="metric-val" id="m-amt">—</div>
-      <div class="metric-sub">@ $0.70/mile</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Trips</div>
-      <div class="metric-val" id="m-trips">—</div>
-      <div class="metric-sub">logged</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Top purpose</div>
-      <div class="metric-val" id="m-top" style="font-size:15px;padding-top:4px;">—</div>
-      <div class="metric-sub">by miles</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Log a trip</div>
-    <div class="base-row">
-      <span style="font-size:15px;">&#127968;</span>
-      <select id="base-select" onchange="selectBase()" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-size:14px;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;"></select>
-      <button class="base-edit" onclick="editAddresses()">&#9998; Edit</button>
-    </div>
-    <div class="field">
-      <label>Date</label>
-      <input type="date" id="f-date" />
-    </div>
-    <div class="field">
-      <label>Purpose</label>
-      <select id="f-purpose">
-        <option value="pastoral">Pastoral visit</option>
-        <option value="hospital">Hospital / sick call</option>
-        <option value="school">School visit</option>
-        <option value="admin">Admin / deanery</option>
-        <option value="other">Other ministry</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Destination address</label>
-      <input type="text" id="f-to" placeholder="e.g. 123 Main St, Denver, CO" />
-    </div>
-    <div id="dist-info" class="dist-info"></div>
-    <div class="miles-calc-row">
-      <div class="field">
-        <label>Miles (round trip)</label>
-        <input type="number" id="f-miles" placeholder="or enter manually" min="0" step="0.1" inputmode="decimal" />
-      </div>
-      <button class="btn-calc" id="calc-btn" onclick="calcDistance()">&#128205; Calculate</button>
-    </div>
-    <div class="field">
-      <label>Notes (optional)</label>
-      <input type="text" id="f-notes" placeholder="e.g. Anointing of the sick" />
-    </div>
-    <button class="btn btn-primary" onclick="addTrip()">+ Add trip</button>
-    <button class="btn btn-secondary" onclick="exportMileageCSV()">&#8659; Export CSV for tax return</button>
-    <div class="note">IRS rate 2025: $0.70/mile &middot; Round trip &middot; Saved to Google Sheets</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Trip log</div>
-    <div class="filter-row" id="mile-filters">
-      <button class="fbtn active" onclick="setMileFilter('all',this)">All</button>
-      <button class="fbtn" onclick="setMileFilter('pastoral',this)">Pastoral</button>
-      <button class="fbtn" onclick="setMileFilter('hospital',this)">Hospital</button>
-      <button class="fbtn" onclick="setMileFilter('school',this)">School</button>
-      <button class="fbtn" onclick="setMileFilter('admin',this)">Admin</button>
-      <button class="fbtn" onclick="setMileFilter('other',this)">Other</button>
-    </div>
-    <div id="trip-log"><div class="empty">Loading trips...</div></div>
-  </div>
-</div>
-
-<!-- INTENTIONS PAGE -->
-<div class="page" id="page-intentions">
-  <div class="section-hd">Mass intentions</div>
-  <div class="today-date" id="today-label"></div>
-
-  <div class="card">
-    <div class="card-title">Add intention</div>
-    <div class="field">
-      <label>Date of Mass</label>
-      <input type="date" id="i-date" />
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Mass time</label>
-        <select id="i-time">
-          <option>7:00 AM</option>
-          <option>9:00 AM</option>
-          <option>10:00 AM</option>
-          <option>12:00 PM</option>
-          <option>6:00 PM</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Living or deceased</label>
-        <select id="i-type">
-          <option value="living">Living</option>
-          <option value="deceased">Deceased &#8224;</option>
-        </select>
-      </div>
-    </div>
-    <div class="field">
-      <label>Name(s)</label>
-      <input type="text" id="i-name" placeholder="e.g. Margaret O'Brien" />
-    </div>
-    <div class="field">
-      <label>Requested by</label>
-      <input type="text" id="i-requestor" placeholder="e.g. The O'Brien family" />
-    </div>
-    <button class="btn btn-primary" onclick="addIntention()">+ Add intention</button>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Upcoming intentions</div>
-    <div class="filter-row">
-      <button class="fbtn active" onclick="setIntFilter('upcoming',this)">Upcoming</button>
-      <button class="fbtn" onclick="setIntFilter('today',this)">Today</button>
-      <button class="fbtn" onclick="setIntFilter('all',this)">All</button>
-    </div>
-    <div id="int-log"><div class="empty">Loading intentions...</div></div>
-  </div>
-</div>
-
-<!-- REIMBURSEMENTS PAGE -->
-<div class="page" id="page-reimb">
-  <div class="metrics">
-    <div class="metric">
-      <div class="metric-label">Pending</div>
-      <div class="metric-val" id="r-pending">—</div>
-      <div class="metric-sub">awaiting approval</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Approved YTD</div>
-      <div class="metric-val" id="r-approved">—</div>
-      <div class="metric-sub">this year</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">New reimbursement</div>
-    <div class="field">
-      <label>Description</label>
-      <input type="text" id="r-desc" placeholder="e.g. Altar candles" />
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Amount ($)</label>
-        <input type="number" id="r-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal" />
-      </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="r-date" />
-      </div>
-    </div>
-    <div class="field">
-      <label>Category</label>
-      <select id="r-cat">
-        <option value="liturgical">Liturgical supplies</option>
-        <option value="travel">Travel</option>
-        <option value="office">Office / admin</option>
-        <option value="pastoral">Pastoral care</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Notes (optional)</label>
-      <input type="text" id="r-notes" placeholder="e.g. Receipt attached" />
-    </div>
-    <button class="btn btn-primary" onclick="addReimb()">+ Submit reimbursement</button>
-    <button class="btn btn-secondary" onclick="exportReimbCSV()">&#8659; Export CSV</button>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Reimbursement log</div>
-    <div id="reimb-log"><div class="empty">Loading...</div></div>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-item active" onclick="showPage('mileage',this)">
-    <span class="nav-icon">&#128663;</span>
-    <span class="nav-label">Mileage</span>
-  </button>
-  <button class="nav-item" onclick="showPage('intentions',this)">
-    <span class="nav-icon">&#128293;</span>
-    <span class="nav-label">Intentions</span>
-  </button>
-  <button class="nav-item" onclick="showPage('reimb',this)">
-    <span class="nav-icon">&#129534;</span>
-    <span class="nav-label">Reimbursements</span>
-  </button>
-</nav>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
-const SHEET_ID = '17D-LxtlzAjYtelntQ6elCW-939Zkjqav6B53YM6tcmA';
-const API_KEY_MAPS = 'AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU';
-const RATE = 0.70;
-const SA = {
-  client_email: 'parish-app@parish-mileage.iam.gserviceaccount.com',
-  private_key: `-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDq0vbNExEec4X1\n3saLfxrFsc7OiR2de1clvRCN+mGAMKPeIPBFl/E7NSYTRRYk4wx5VS/NpHXzJ7fd\nPNGoHSNczj55yRh6LrNmHdOtSPD+3D5sJVFlj5jhnDgBBtyAteXYiZ7vLd4NMFx6\nPx8alCWJiS6bPooDUT2TevPMLDVPG0BGGuZWZGmMYmQlmfyhDvPkx+CfDyhNHkwu\nC2A+yHK+RYnK4diYI1lWTROvuzlNRfUBna/A86+HN8csvVduPcnbBEQWCfi0KO+n\n6UQ7s4GWnDcbLxTG4oqjS60CLPxTqFtnu9NtEaGjAdC2xUnF3JQVSdrGUai9bUcU\ny+I0aHrTAgMBAAECggEAJ2MQS3B9yBZHa2ic88vzgSJkVkcwZPhJs0ZFjxLmpLpD\n2h+7PWkRaMVu5/+ICdLdhkJwHLWPpSPN1rl7Tw/oHQpo90NwLBpGNAQfu6qG5bCq\ndbhCsV7HHVx3FlEAzkP0VAAtXN/cJWktscGBpZMgwrN0UkzImGrZgbG3T9FAdc6B\nlnMCN+2XQXBLnKS4ldWvbE5i5mS/peV5I0mrg+E8OujW/Zvm8viXaIWL7S3Z3sQ0\nCMHC1JGYrC6jKKILc4bx8LX8//WeQbDrRyQbKzhtplXNxW3um3LOWNLxPKvl2BnY\nRPrbH4NMlYDsaBSGrR2rTFuZ4HaQtfzepj8Cjd54DQKBgQD2kgEOWORfCZzFfKyk\n6m8W+JU/U4/w7eXfiw7re0dXeBgokMBG2N3cD2LI1v80oasZiO50UfM0Y5tykWbw\nAtN0nMGzKlLJyqT6ef9v0XJz1JkHsrld68RUboKd/1ujDVSurFLTwQA+BwrRcBqw\nJrg8mecAF0fyEh8p71lTPrGBJQKBgQDzzfXwv1vkkrBDT842Sv1oRS0kCtIuVSUv\n6s0Rgaletu1rgpuWr/JUHJzM/V9i/If2l4j3iiV+HRIsrw7n76OKzalJh9/i/unh\ni7ALIruIEzuHjMwFYFG4IVsflATi1DJXEasQ65/U47159dhJTr3cuiO/kArK2/EG\nroVAj8G2lwKBgASev75RFBZjy7g3mdSNP/+iMMm6+xt8ma4SoPjwmmmdKna4H6I0\nNhQFhchVnvqRfO9BjZZIYtI8e5EuAEvHAcdRmJ+Oz3ZQgb7fwlWKCyb4eNWYF7kW\nzdr3JyNmwYTQnyGWwQaOuz5uS1mZTCa40wLvr1BlH0f95u+WOIpCxnixAoGAF+P4\n06yMvqs5Jn9tf5h9mHge4kdFLVEeocFqcuq3xBY80aoswOlg36kmHFg/vp1sXVeg\nDlG1NtR2cXZ+CXBMIE/i5Nexsra0CGv9xjmTEtR/otrDK0uy9k4edcu1ZtzQSgPr\nNW9BbEUczhSvKw/SPwzmb+EXjaVbywHTAO6VVuUCgYB8+selzOZu+mnwg3xuidR1\nCIvAhhoG59eCRTNGrf/iPpDk8hLbChjiVzIIL+55d9bdYpiz5s7OxHS/hCBuyPby\n4dd4qC3Kj9/MgP2JApTUVaYqbQqyGzcPtNZB7y33cGR5aruqNRazV0GVjcWVYFZb\nIwSmeIKF1qVMkfEGKDNOIg==\n-----END PRIVATE KEY-----\n`
-};
+const SHEET_ID='17D-LxtlzAjYtelntQ6elCW-939Zkjqav6B53YM6tcmA';
+const API_KEY_MAPS='AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU';
+const RATE=0.70;
+const SA_EMAIL='parish-app@parish-mileage.iam.gserviceaccount.com';
+const SA_KEY=`-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDq0vbNExEec4X1\n3saLfxrFsc7OiR2de1clvRCN+mGAMKPeIPBFl/E7NSYTRRYk4wx5VS/NpHXzJ7fd\nPNGoHSNczj55yRh6LrNmHdOtSPD+3D5sJVFlj5jhnDgBBtyAteXYiZ7vLd4NMFx6\nPx8alCWJiS6bPooDUT2TevPMLDVPG0BGGuZWZGmMYmQlmfyhDvPkx+CfDyhNHkwu\nC2A+yHK+RYnK4diYI1lWTROvuzlNRfUBna/A86+HN8csvVduPcnbBEQWCfi0KO+n\n6UQ7s4GWnDcbLxTG4oqjS60CLPxTqFtnu9NtEaGjAdC2xUnF3JQVSdrGUai9bUcU\ny+I0aHrTAgMBAAECggEAJ2MQS3B9yBZHa2ic88vzgSJkVkcwZPhJs0ZFjxLmpLpD\n2h+7PWkRaMVu5/+ICdLdhkJwHLWPpSPN1rl7Tw/oHQpo90NwLBpGNAQfu6qG5bCq\ndbhCsV7HHVx3FlEAzkP0VAAtXN/cJWktscGBpZMgwrN0UkzImGrZgbG3T9FAdc6B\nlnMCN+2XQXBLnKS4ldWvbE5i5mS/peV5I0mrg+E8OujW/Zvm8viXaIWL7S3Z3sQ0\nCMHC1JGYrC6jKKILc4bx8LX8//WeQbDrRyQbKzhtplXNxW3um3LOWNLxPKvl2BnY\nRPrbH4NMlYDsaBSGrR2rTFuZ4HaQtfzepj8Cjd54DQKBgQD2kgEOWORfCZzFfKyk\n6m8W+JU/U4/w7eXfiw7re0dXeBgokMBG2N3cD2LI1v80oasZiO50UfM0Y5tykWbw\nAtN0nMGzKlLJyqT6ef9v0XJz1JkHsrld68RUboKd/1ujDVSurFLTwQA+BwrRcBqw\nJrg8mecAF0fyEh8p71lTPrGBJQKBgQDzzfXwv1vkkrBDT842Sv1oRS0kCtIuVSUv\n6s0Rgaletu1rgpuWr/JUHJzM/V9i/If2l4j3iiV+HRIsrw7n76OKzalJh9/i/unh\ni7ALIruIEzuHjMwFYFG4IVsflATi1DJXEasQ65/U47159dhJTr3cuiO/kArK2/EG\nroVAj8G2lwKBgASev75RFBZjy7g3mdSNP/+iMMm6+xt8ma4SoPjwmmmdKna4H6I0\nNhQFhchVnvqRfO9BjZZIYtI8e5EuAEvHAcdRmJ+Oz3ZQgb7fwlWKCyb4eNWYF7kW\nzdr3JyNmwYTQnyGWwQaOuz5uS1mZTCa40wLvr1BlH0f95u+WOIpCxnixAoGAF+P4\n06yMvqs5Jn9tf5h9mHge4kdFLVEeocFqcuq3xBY80aoswOlg36kmHFg/vp1sXVeg\nDlG1NtR2cXZ+CXBMIE/i5Nexsra0CGv9xjmTEtR/otrDK0uy9k4edcu1ZtzQSgPr\nNW9BbEUczhSvKw/SPwzmb+EXjaVbywHTAO6VVuUCgYB8+selzOZu+mnwg3xuidR1\nCIvAhhoG59eCRTNGrf/iPpDk8hLbChjiVzIIL+55d9bdYpiz5s7OxHS/hCBuyPby\n4dd4qC3Kj9/MgP2JApTUVaYqbQqyGzcPtNZB7y33cGR5aruqNRazV0GVjcWVYFZb\nIwSmeIKF1qVMkfEGKDNOIg==\n-----END PRIVATE KEY-----\n`;
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-let trips=[], intentions=[], reimbs=[];
-let baseAddress = 'Parish house';
-let mileFilter='all', intFilter='upcoming';
-let accessToken=null, tokenExpiry=0;
+let trips=[],intentions=[],reimbs=[],stoles=[];
+let mileFilter='all',intFilter='upcoming',stoleFilter='all';
+let accessToken=null,tokenExpiry=0;
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+let selectedCalDate=null;
+const TODAY=new Date().toISOString().split('T')[0];
 const purposeLabels={pastoral:'Pastoral',hospital:'Hospital',school:'School',admin:'Admin',other:'Other'};
 const purposeClass={pastoral:'b-pastoral',hospital:'b-hospital',school:'b-school',admin:'b-admin',other:'b-other'};
+const stoleLabels={wedding:'Wedding',funeral:'Funeral',baptism:'Baptism',stipend:'Stipend',blessing:'Blessing/Other'};
 const reimbCats={liturgical:'Liturgical',travel:'Travel',office:'Office',pastoral:'Pastoral care',other:'Other'};
 
-// ── TOAST ────────────────────────────────────────────────────────────────────
+// PIN
+const CORRECT_PIN='1194';
+let pinEntry='';
+let pinAttempts=parseInt(localStorage.getItem('pin_attempts')||'0');
+let pinLockedUntil=parseInt(localStorage.getItem('pin_locked_until')||'0');
+
+function checkPinLock(){
+  if(pinLockedUntil&&Date.now()<pinLockedUntil){showLockTimer();return true;}
+  if(pinLockedUntil&&Date.now()>=pinLockedUntil){pinAttempts=0;localStorage.removeItem('pin_attempts');localStorage.removeItem('pin_locked_until');pinLockedUntil=0;}
+  return false;
+}
+function showLockTimer(){
+  const rem=Math.ceil((pinLockedUntil-Date.now())/1000);
+  document.getElementById('pin-locked').textContent=`Too many attempts. Try again in ${Math.floor(rem/60)}:${String(rem%60).padStart(2,'0')}`;
+  document.getElementById('pin-error').textContent='';
+  if(Date.now()<pinLockedUntil)setTimeout(showLockTimer,1000);
+  else{document.getElementById('pin-locked').textContent='';pinAttempts=0;}
+}
+function pinPress(d){
+  if(checkPinLock())return;
+  if(pinEntry.length>=4)return;
+  pinEntry+=d;updatePinDots();
+  if(pinEntry.length===4)setTimeout(checkPin,150);
+}
+function pinDel(){
+  if(checkPinLock())return;
+  pinEntry=pinEntry.slice(0,-1);updatePinDots();
+  document.getElementById('pin-error').textContent='';
+}
+function updatePinDots(state){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    d.classList.remove('filled','error');
+    if(state==='error')d.classList.add('error');
+    else if(i<pinEntry.length)d.classList.add('filled');
+  }
+}
+function checkPin(){
+  if(pinEntry===CORRECT_PIN){
+    pinAttempts=0;localStorage.removeItem('pin_attempts');localStorage.removeItem('pin_locked_until');
+    localStorage.setItem('pin_unlocked_until',Date.now()+8*60*60*1000);
+    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  }else{
+    pinAttempts++;localStorage.setItem('pin_attempts',pinAttempts);
+    updatePinDots('error');
+    if(pinAttempts>=3){
+      pinLockedUntil=Date.now()+5*60*1000;localStorage.setItem('pin_locked_until',pinLockedUntil);
+      document.getElementById('pin-error').textContent='';showLockTimer();
+    }else{
+      document.getElementById('pin-error').textContent=`Incorrect PIN. ${3-pinAttempts} attempt${3-pinAttempts===1?'':'s'} remaining.`;
+    }
+    setTimeout(()=>{pinEntry='';updatePinDots();},600);
+  }
+}
+
+// NAV
+function openPage(name){
+  document.getElementById('page-home').style.display='none';
+  document.querySelectorAll('.inner-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+}
+function goHome(){
+  document.querySelectorAll('.inner-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-home').style.display='block';
+}
+
+// TOAST / SYNC
 function toast(msg,type='ok'){
   const el=document.getElementById('toast');
-  el.textContent=msg;
-  el.className='toast toast-'+(type==='ok'?'ok':'err')+' show';
+  el.textContent=msg;el.className='toast toast-'+(type==='ok'?'ok':'err')+' show';
   setTimeout(()=>el.classList.remove('show'),2500);
 }
-
-// ── SYNC BADGE ───────────────────────────────────────────────────────────────
 function setSyncBadge(state){
   const b=document.getElementById('sync-badge');
-  if(state==='ok'){b.textContent='✓ Synced';b.className='sync-badge';}
-  else if(state==='syncing'){b.textContent='↻ Saving…';b.className='sync-badge syncing';}
-  else{b.textContent='⚠ Offline';b.className='sync-badge error';}
+  if(state==='ok'){b.textContent='✓ Synced with Google Sheets';b.className='sync-pill';}
+  else if(state==='syncing'){b.textContent='↻ Saving…';b.className='sync-pill syncing';}
+  else{b.textContent='⚠ Sync error';b.className='sync-pill error';}
 }
 
-// ── JWT / AUTH ────────────────────────────────────────────────────────────────
+// AUTH
 async function getToken(){
-  if(accessToken && Date.now()<tokenExpiry-60000) return accessToken;
-  try{
-    const now=Math.floor(Date.now()/1000);
-    const header=btoa(JSON.stringify({alg:'RS256',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const claim=btoa(JSON.stringify({
-      iss:SA.client_email,
-      scope:'https://www.googleapis.com/auth/spreadsheets',
-      aud:'https://oauth2.googleapis.com/token',
-      exp:now+3600, iat:now
-    })).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const unsigned=header+'.'+claim;
-    const keyData=SA.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g,'');
-    const binaryKey=Uint8Array.from(atob(keyData),c=>c.charCodeAt(0));
-    const cryptoKey=await crypto.subtle.importKey('pkcs8',binaryKey,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
-    const sig=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',cryptoKey,new TextEncoder().encode(unsigned));
-    const sigB64=btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const jwt=unsigned+'.'+sigB64;
-    const resp=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`});
-    const data=await resp.json();
-    accessToken=data.access_token;
-    tokenExpiry=Date.now()+data.expires_in*1000;
-    return accessToken;
-  }catch(e){console.error('Auth error',e);return null;}
+  if(accessToken&&Date.now()<tokenExpiry-60000)return accessToken;
+  const now=Math.floor(Date.now()/1000);
+  const hdr=btoa(JSON.stringify({alg:'RS256',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const clm=btoa(JSON.stringify({iss:SA_EMAIL,scope:'https://www.googleapis.com/auth/spreadsheets',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const unsigned=hdr+'.'+clm;
+  const keyData=SA_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g,'');
+  const binKey=Uint8Array.from(atob(keyData),c=>c.charCodeAt(0));
+  const ck=await crypto.subtle.importKey('pkcs8',binKey,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
+  const sig=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',ck,new TextEncoder().encode(unsigned));
+  const sigB64=btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const jwt=unsigned+'.'+sigB64;
+  const resp=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`});
+  const data=await resp.json();
+  accessToken=data.access_token;tokenExpiry=Date.now()+data.expires_in*1000;
+  return accessToken;
 }
 
-// ── SHEETS API ────────────────────────────────────────────────────────────────
+// SHEETS
 async function sheetsGet(range){
-  const tok=await getToken(); if(!tok) return null;
+  const tok=await getToken();
   const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}`,{headers:{Authorization:`Bearer ${tok}`}});
-  const d=await r.json(); return d.values||[];
+  return (await r.json()).values||[];
 }
-
 async function sheetsAppend(range,values){
-  const tok=await getToken(); if(!tok) throw new Error('No token');
-  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{method:'POST',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'},body:JSON.stringify({values})});
-  return r.json();
+  const tok=await getToken();
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{method:'POST',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'},body:JSON.stringify({values})});
 }
 
-async function sheetsClear(range){
-  const tok=await getToken(); if(!tok) throw new Error('No token');
-  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}:clear`,{method:'POST',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'}});
-}
-
-async function sheetsUpdate(range,values){
-  const tok=await getToken(); if(!tok) throw new Error('No token');
-  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,{method:'PUT',headers:{Authorization:`Bearer ${tok}`,'Content-Type':'application/json'},body:JSON.stringify({values})});
-}
-
-// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+// LOAD
 async function loadAll(){
   setSyncBadge('syncing');
   try{
-    const [tr,it,re]=await Promise.all([
+    const [tr,it,re,st]=await Promise.all([
       sheetsGet('Mileage!A2:G'),
       sheetsGet('Intentions!A2:F'),
-      sheetsGet('Reimbursements!A2:G')
+      sheetsGet('Reimbursements!A2:G'),
+      sheetsGet('StoleFees!A2:F')
     ]);
-    trips=(tr||[]).map(r=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'other',miles:parseFloat(r[4])||0,amount:parseFloat(r[5])||0,notes:r[6]||''})).reverse();
-    intentions=(it||[]).map(r=>({date:r[0]||'',time:r[1]||'',type:r[2]||'living',name:r[3]||'',requestor:r[4]||'',notes:r[5]||''})).reverse();
+    trips=(tr||[]).map(r=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'other',miles:parseFloat(r[4])||0,notes:r[6]||''})).reverse();
+    intentions=(it||[]).map(r=>({date:r[0]||'',time:r[1]||'',type:r[2]||'living',name:r[3]||'',requestor:r[4]||''})).reverse();
     reimbs=(re||[]).map(r=>({date:r[0]||'',desc:r[1]||'',category:r[2]||'other',amount:parseFloat(r[3])||0,status:r[4]||'pending',notes:r[5]||''})).reverse();
+    stoles=(st||[]).map(r=>({date:r[0]||'',type:r[1]||'other',amount:parseFloat(r[2])||0,from:r[3]||'',notes:r[4]||''})).reverse();
     setSyncBadge('ok');
+    renderTrips();renderIntentions();renderReimbs();renderStoles();
+    updateMileMetrics();updateReimbMetrics();updateStoleMetrics();
+    renderCalendar();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Could not load data — check connection','err');}
-  renderTrips(); renderIntentions(); renderReimbs(); updateMileMetrics(); updateReimbMetrics();
 }
 
-// ── NAV ───────────────────────────────────────────────────────────────────────
-function showPage(name,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  btn.classList.add('active');
+// HOME CARDS
+function updateHomeCards(){
+  const year=new Date().getFullYear().toString();
+  const totalMiles=trips.filter(t=>t.date.startsWith(year)).reduce((s,t)=>s+t.miles,0);
+  document.getElementById('hb-mileage').textContent='$'+Math.round(totalMiles*RATE)+' claimable';
+  const todayInts=intentions.filter(i=>i.date===TODAY).length;
+  document.getElementById('hb-intentions').textContent=todayInts?`${todayInts} intention${todayInts>1?'s':''} today`:'No intentions today';
+  const stoleTotal=stoles.filter(s=>s.date.startsWith(year)).reduce((s,r)=>s+r.amount,0);
+  document.getElementById('hb-stole').textContent='$'+stoleTotal.toFixed(0)+' this year';
+  const pending=reimbs.filter(r=>r.status==='pending').reduce((s,r)=>s+r.amount,0);
+  document.getElementById('hb-reimb').textContent=pending>0?'$'+pending.toFixed(0)+' pending':'No pending';
 }
 
-// ── MILEAGE ───────────────────────────────────────────────────────────────────
-let savedAddresses = JSON.parse(localStorage.getItem('parish_addresses')||'null') || [
-  {label:'Rectory', address:''},
-  {label:'Church', address:''}
-];
-
+// ADDRESSES
+let baseAddress='Parish house';
+let savedAddresses=JSON.parse(localStorage.getItem('parish_addresses')||'null')||[{label:'Rectory',address:''},{label:'Church',address:''}];
 function renderBaseSelect(){
-  const sel = document.getElementById('base-select');
-  sel.innerHTML = savedAddresses.map((a,i)=>
-    `<option value="${i}">${a.label}${a.address?' — '+a.address.split(',')[0]:' (tap Edit to set address)'}</option>`
-  ).join('');
-  const saved = parseInt(localStorage.getItem('parish_base_idx')||'0');
-  sel.value = saved < savedAddresses.length ? saved : 0;
-  baseAddress = savedAddresses[sel.value].address || savedAddresses[sel.value].label;
+  const sel=document.getElementById('base-select');
+  sel.innerHTML=savedAddresses.map((a,i)=>`<option value="${i}">${a.label}${a.address?' — '+a.address.split(',')[0]:' (tap Edit)'}</option>`).join('');
+  const idx=parseInt(localStorage.getItem('parish_base_idx')||'0');
+  sel.value=idx<savedAddresses.length?idx:0;
+  baseAddress=savedAddresses[sel.value].address||savedAddresses[sel.value].label;
 }
-
 function selectBase(){
-  const idx = document.getElementById('base-select').value;
-  localStorage.setItem('parish_base_idx', idx);
-  baseAddress = savedAddresses[idx].address || savedAddresses[idx].label;
+  const idx=document.getElementById('base-select').value;
+  localStorage.setItem('parish_base_idx',idx);
+  baseAddress=savedAddresses[idx].address||savedAddresses[idx].label;
 }
-
 function editAddresses(){
   savedAddresses.forEach((a,i)=>{
-    const lbl = prompt(`Name for address ${i+1} (e.g. Rectory):`, a.label);
-    if(lbl && lbl.trim()) savedAddresses[i].label = lbl.trim();
-    const addr = prompt(`Full address for "${savedAddresses[i].label}":`, a.address);
-    if(addr !== null) savedAddresses[i].address = addr.trim();
+    const lbl=prompt(`Label for address ${i+1}:`,a.label);
+    if(lbl&&lbl.trim())savedAddresses[i].label=lbl.trim();
+    const addr=prompt(`Full address for "${savedAddresses[i].label}":`,a.address);
+    if(addr!==null)savedAddresses[i].address=addr.trim();
   });
-  localStorage.setItem('parish_addresses', JSON.stringify(savedAddresses));
-  renderBaseSelect();
-  toast('Addresses saved ✓');
+  localStorage.setItem('parish_addresses',JSON.stringify(savedAddresses));
+  renderBaseSelect();toast('Addresses saved ✓');
 }
 
-renderBaseSelect();
-document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+// MILEAGE
+function fmtDate(d){if(!d)return '';const[y,m,day]=d.split('-');return `${m}/${day}/${y.slice(2)}`;}
 
 async function calcDistance(){
   const to=document.getElementById('f-to').value.trim();
   if(!to){alert('Enter a destination first.');return;}
   const btn=document.getElementById('calc-btn');
-  btn.disabled=true; btn.textContent='Calculating…';
+  btn.disabled=true;btn.textContent='Calculating…';
   try{
     const url=`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(baseAddress)}&destinations=${encodeURIComponent(to)}&units=imperial&key=${API_KEY_MAPS}`;
-    const d=await (await fetch(url)).json();
+    const d=await(await fetch(url)).json();
     if(d.status==='OK'&&d.rows[0].elements[0].status==='OK'){
-      const m=d.rows[0].elements[0].distance.value;
-      const oneway=m/1609.344, rt=oneway*2;
+      const ow=d.rows[0].elements[0].distance.value/1609.344,rt=ow*2;
       document.getElementById('f-miles').value=rt.toFixed(1);
       const info=document.getElementById('dist-info');
-      info.style.display='block';
-      info.textContent=`One way: ${oneway.toFixed(1)} mi · Round trip: ${rt.toFixed(1)} mi`;
-    }else{toast('Address not found — try adding city & state','err');}
+      info.style.display='block';info.textContent=`One way: ${ow.toFixed(1)} mi · Round trip: ${rt.toFixed(1)} mi`;
+    }else toast('Address not found — try adding city & state','err');
   }catch(e){toast('Network error','err');}
-  btn.disabled=false; btn.textContent='📍 Calculate';
+  btn.disabled=false;btn.textContent='📍 Calculate';
 }
 
 async function addTrip(){
@@ -631,70 +632,82 @@ async function addTrip(){
   setSyncBadge('syncing');
   try{
     await sheetsAppend('Mileage!A:G',[[date,baseAddress,to,purpose,miles.toFixed(1),(miles*RATE).toFixed(2),notes]]);
-    trips.unshift({date,from:baseAddress,to,purpose,miles,amount:miles*RATE,notes});
-    document.getElementById('f-miles').value='';
-    document.getElementById('f-to').value='';
-    document.getElementById('f-notes').value='';
+    trips.unshift({date,from:baseAddress,to,purpose,miles,notes});
+    document.getElementById('f-miles').value='';document.getElementById('f-to').value='';document.getElementById('f-notes').value='';
     document.getElementById('dist-info').style.display='none';
-    setSyncBadge('ok'); toast('Trip saved to Google Sheets ✓');
-    renderTrips(); updateMileMetrics();
-  }catch(e){setSyncBadge('error');toast('Save failed — check connection','err');}
+    setSyncBadge('ok');toast('Trip saved ✓');
+    renderTrips();updateMileMetrics();updateHomeCards();
+  }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
 
 function setMileFilter(f,btn){
   mileFilter=f;
-  document.querySelectorAll('#mile-filters .fbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); renderTrips();
+  document.querySelectorAll('#page-mileage .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderTrips();
 }
-
-function fmtDate(d){if(!d)return '';const[y,m,day]=d.split('-');return `${m}/${day}/${y.slice(2)}`;}
-
 function renderTrips(){
   const filtered=mileFilter==='all'?trips:trips.filter(t=>t.purpose===mileFilter);
   const el=document.getElementById('trip-log');
   if(!filtered.length){el.innerHTML='<div class="empty">No trips yet.</div>';return;}
-  el.innerHTML=filtered.map((t,i)=>`
-    <div class="trip-item">
-      <div class="trip-top">
-        <div class="trip-route">${t.from} → ${t.to}</div>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <span class="trip-amount">$${(t.miles*RATE).toFixed(2)}</span>
-        </div>
-      </div>
-      <div class="trip-meta">
-        <span class="trip-date">${fmtDate(t.date)}</span>
-        <span class="badge ${purposeClass[t.purpose]}">${purposeLabels[t.purpose]}</span>
-        <span class="trip-date">${parseFloat(t.miles).toFixed(1)} mi</span>
-        ${t.notes?`<span class="trip-date">· ${t.notes}</span>`:''}
-      </div>
-    </div>`).join('');
+  el.innerHTML=filtered.map(t=>`<div class="trip-item"><div class="item-top"><div class="item-title">${t.from} → ${t.to}</div><span class="item-amount">$${(t.miles*RATE).toFixed(2)}</span></div><div class="item-meta"><span class="item-date">${fmtDate(t.date)}</span><span class="badge ${purposeClass[t.purpose]}">${purposeLabels[t.purpose]}</span><span class="item-date">${parseFloat(t.miles).toFixed(1)} mi</span>${t.notes?`<span class="item-date">· ${t.notes}</span>`:''}</div></div>`).join('');
 }
-
 function updateMileMetrics(){
   const year=new Date().getFullYear().toString();
-  const yearTrips=trips.filter(t=>t.date.startsWith(year));
-  const total=yearTrips.reduce((s,t)=>s+parseFloat(t.miles),0);
+  const yt=trips.filter(t=>t.date.startsWith(year));
+  const total=yt.reduce((s,t)=>s+parseFloat(t.miles),0);
   document.getElementById('m-miles').textContent=total.toFixed(1);
   document.getElementById('m-amt').textContent='$'+Math.round(total*RATE);
-  document.getElementById('m-trips').textContent=yearTrips.length;
-  if(!yearTrips.length){document.getElementById('m-top').textContent='—';return;}
-  const byP={};
-  yearTrips.forEach(t=>{byP[t.purpose]=(byP[t.purpose]||0)+parseFloat(t.miles);});
+  document.getElementById('m-trips').textContent=yt.length;
+  if(!yt.length){document.getElementById('m-top').textContent='—';return;}
+  const byP={};yt.forEach(t=>{byP[t.purpose]=(byP[t.purpose]||0)+t.miles;});
   document.getElementById('m-top').textContent=purposeLabels[Object.entries(byP).sort((a,b)=>b[1]-a[1])[0][0]];
 }
-
 function exportMileageCSV(){
   const rows=[['Date','From','To','Purpose','Miles','Amount ($)','Notes']];
   trips.forEach(t=>rows.push([t.date,t.from,t.to,purposeLabels[t.purpose],parseFloat(t.miles).toFixed(1),(t.miles*RATE).toFixed(2),t.notes||'']));
-  const total=trips.reduce((s,t)=>s+parseFloat(t.miles),0);
-  rows.push(['','','','TOTAL',total.toFixed(1),(total*RATE).toFixed(2),'']);
+  rows.push(['','','','TOTAL',trips.reduce((s,t)=>s+parseFloat(t.miles),0).toFixed(1),(trips.reduce((s,t)=>s+parseFloat(t.miles),0)*RATE).toFixed(2),'']);
   downloadCSV(rows,'mileage_log.csv');
 }
 
-// ── INTENTIONS ────────────────────────────────────────────────────────────────
-document.getElementById('i-date').value=new Date().toISOString().split('T')[0];
-document.getElementById('today-label').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+// CALENDAR
+function renderCalendar(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month').textContent=months[calMonth]+' '+calYear;
+  const intentionDates=new Set(intentions.map(i=>i.date));
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  let html='';
+  for(let i=0;i<firstDay;i++)html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls='cal-day';
+    if(ds===TODAY)cls+=' today';
+    if(intentionDates.has(ds))cls+=' has-intention';
+    if(ds===selectedCalDate)cls+=' selected';
+    html+=`<div class="${cls}" onclick="selectCalDay('${ds}')">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML=html;
+  if(selectedCalDate)renderCalDayIntentions(selectedCalDate);
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function selectCalDay(date){
+  selectedCalDate=date;renderCalendar();
+  // Auto-fill the date in the add form
+  document.getElementById('i-date').value=date;
+}
+function renderCalDayIntentions(date){
+  const dayInts=intentions.filter(i=>i.date===date);
+  const label=document.getElementById('cal-selected-label');
+  const container=document.getElementById('cal-day-intentions');
+  const d=new Date(date+'T00:00:00');
+  label.style.display='block';
+  label.textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  if(!dayInts.length){container.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0 8px;">No intentions for this day.</div>';return;}
+  container.innerHTML=dayInts.map(i=>`<div class="cal-day-int"><span style="font-size:14px;">${i.type==='deceased'?'†':'✓'}</span><div><div style="font-size:14px;font-weight:500;">${i.name}</div><div style="font-size:12px;color:var(--muted);">${i.time}${i.requestor?' · '+i.requestor:''}</div></div></div>`).join('');
+}
 
+// INTENTIONS
 async function addIntention(){
   const date=document.getElementById('i-date').value;
   const time=document.getElementById('i-time').value;
@@ -705,41 +718,74 @@ async function addIntention(){
   setSyncBadge('syncing');
   try{
     await sheetsAppend('Intentions!A:F',[[date,time,type,name,requestor,'']]);
-    intentions.unshift({date,time,type,name,requestor,notes:''});
-    document.getElementById('i-name').value='';
-    document.getElementById('i-requestor').value='';
-    setSyncBadge('ok'); toast('Intention saved ✓');
-    renderIntentions();
+    intentions.unshift({date,time,type,name,requestor});
+    document.getElementById('i-name').value='';document.getElementById('i-requestor').value='';
+    setSyncBadge('ok');toast('Intention saved ✓');
+    renderIntentions();renderCalendar();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
-
 function setIntFilter(f,btn){
   intFilter=f;
-  document.querySelectorAll('#page-intentions .fbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); renderIntentions();
+  document.querySelectorAll('#page-intentions .card:last-child .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderIntentions();
 }
-
 function renderIntentions(){
-  const today=new Date().toISOString().split('T')[0];
   let filtered=intentions;
-  if(intFilter==='today') filtered=intentions.filter(i=>i.date===today);
-  else if(intFilter==='upcoming') filtered=intentions.filter(i=>i.date>=today);
+  if(intFilter==='today')filtered=intentions.filter(i=>i.date===TODAY);
+  else if(intFilter==='upcoming')filtered=intentions.filter(i=>i.date>=TODAY);
   const el=document.getElementById('int-log');
   if(!filtered.length){el.innerHTML='<div class="empty">No intentions found.</div>';return;}
-  el.innerHTML=filtered.map(i=>`
-    <div class="int-item">
-      <div class="int-top">
-        <div>
-          <div class="int-name">${i.type==='deceased'?'† ':''}<span class="${i.type==='deceased'?'deceased':''}">${i.name}</span></div>
-          <div class="int-meta">${fmtDate(i.date)} · ${i.time}${i.requestor?' · Req. by '+i.requestor:''}</div>
-        </div>
-      </div>
-    </div>`).join('');
+  el.innerHTML=filtered.map(i=>`<div class="int-item"><div class="item-top"><div class="item-title">${i.type==='deceased'?'† ':''}${i.name}</div><span class="badge b-${i.type}">${i.type==='deceased'?'Deceased':'Living'}</span></div><div class="item-meta"><span class="item-date">${fmtDate(i.date)}</span><span class="item-date">· ${i.time}</span>${i.requestor?`<span class="item-date">· ${i.requestor}</span>`:''}</div></div>`).join('');
 }
 
-// ── REIMBURSEMENTS ────────────────────────────────────────────────────────────
-document.getElementById('r-date').value=new Date().toISOString().split('T')[0];
+// STOLE FEES
+async function addStole(){
+  const type=document.getElementById('s-type').value;
+  const amt=parseFloat(document.getElementById('s-amt').value);
+  const date=document.getElementById('s-date').value;
+  const from=document.getElementById('s-from').value.trim();
+  const notes=document.getElementById('s-notes').value.trim();
+  if(!date||isNaN(amt)||amt<=0){alert('Please enter date and amount.');return;}
+  setSyncBadge('syncing');
+  try{
+    await sheetsAppend('StoleFees!A:F',[[date,type,amt.toFixed(2),from,notes,'']]);
+    stoles.unshift({date,type,amount:amt,from,notes});
+    document.getElementById('s-amt').value='';document.getElementById('s-from').value='';document.getElementById('s-notes').value='';
+    setSyncBadge('ok');toast('Stole fee saved ✓');
+    renderStoles();updateStoleMetrics();updateHomeCards();
+  }catch(e){setSyncBadge('error');toast('Save failed','err');}
+}
+function setStoleFilter(f,btn){
+  stoleFilter=f;
+  document.querySelectorAll('#page-stole .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderStoles();
+}
+function renderStoles(){
+  const filtered=stoleFilter==='all'?stoles:stoles.filter(s=>s.type===stoleFilter);
+  const el=document.getElementById('stole-log');
+  if(!filtered.length){el.innerHTML='<div class="empty">No fees recorded yet.</div>';return;}
+  el.innerHTML=filtered.map(s=>`<div class="stole-item"><div class="item-top"><div class="item-title">${stoleLabels[s.type]||s.type}${s.from?' — '+s.from:''}</div><span class="item-amount">$${parseFloat(s.amount).toFixed(2)}</span></div><div class="item-meta"><span class="item-date">${fmtDate(s.date)}</span>${s.notes?`<span class="item-date">· ${s.notes}</span>`:''}</div></div>`).join('');
+}
+function updateStoleMetrics(){
+  const year=new Date().getFullYear().toString();
+  const month=String(new Date().getMonth()+1).padStart(2,'0');
+  const yt=stoles.filter(s=>s.date.startsWith(year));
+  const mt=stoles.filter(s=>s.date.startsWith(`${year}-${month}`));
+  document.getElementById('s-total').textContent='$'+yt.reduce((s,r)=>s+r.amount,0).toFixed(0);
+  document.getElementById('s-month').textContent='$'+mt.reduce((s,r)=>s+r.amount,0).toFixed(0);
+  document.getElementById('s-count').textContent=yt.length;
+  if(!yt.length){document.getElementById('s-top').textContent='—';return;}
+  const byT={};yt.forEach(s=>{byT[s.type]=(byT[s.type]||0)+s.amount;});
+  document.getElementById('s-top').textContent=stoleLabels[Object.entries(byT).sort((a,b)=>b[1]-a[1])[0][0]];
+}
+function exportStoleCSV(){
+  const rows=[['Date','Type','Amount ($)','From / Occasion','Notes']];
+  stoles.forEach(s=>rows.push([s.date,stoleLabels[s.type]||s.type,parseFloat(s.amount).toFixed(2),s.from||'',s.notes||'']));
+  rows.push(['','TOTAL',stoles.reduce((s,r)=>s+r.amount,0).toFixed(2),'','']);
+  downloadCSV(rows,'stole_fees.csv');
+}
 
+// REIMBURSEMENTS
 async function addReimb(){
   const desc=document.getElementById('r-desc').value.trim();
   const amt=parseFloat(document.getElementById('r-amt').value);
@@ -751,147 +797,55 @@ async function addReimb(){
   try{
     await sheetsAppend('Reimbursements!A:G',[[date,desc,cat,amt.toFixed(2),'pending',notes,'']]);
     reimbs.unshift({date,desc,category:cat,amount:amt,status:'pending',notes});
-    document.getElementById('r-desc').value='';
-    document.getElementById('r-amt').value='';
-    document.getElementById('r-notes').value='';
-    setSyncBadge('ok'); toast('Reimbursement saved ✓');
-    renderReimbs(); updateReimbMetrics();
+    document.getElementById('r-desc').value='';document.getElementById('r-amt').value='';document.getElementById('r-notes').value='';
+    setSyncBadge('ok');toast('Reimbursement saved ✓');
+    renderReimbs();updateReimbMetrics();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
-
 function renderReimbs(){
   const el=document.getElementById('reimb-log');
   if(!reimbs.length){el.innerHTML='<div class="empty">No reimbursements yet.</div>';return;}
-  el.innerHTML=reimbs.map(r=>`
-    <div class="reimb-item">
-      <div class="reimb-top">
-        <div>
-          <div class="reimb-desc">${r.desc}</div>
-          <div class="reimb-meta">${fmtDate(r.date)} · ${reimbCats[r.category]||r.category}${r.notes?' · '+r.notes:''}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-          <span class="reimb-amt">$${parseFloat(r.amount).toFixed(2)}</span>
-          <span class="badge status-${r.status}">${r.status}</span>
-        </div>
-      </div>
-    </div>`).join('');
+  el.innerHTML=reimbs.map(r=>`<div class="reimb-item"><div class="item-top"><div class="item-title">${r.desc}</div><span class="item-amount">$${parseFloat(r.amount).toFixed(2)}</span></div><div class="item-meta"><span class="item-date">${fmtDate(r.date)}</span><span class="item-date">· ${reimbCats[r.category]||r.category}</span><span class="badge status-${r.status}">${r.status}</span>${r.notes?`<span class="item-date">· ${r.notes}</span>`:''}</div></div>`).join('');
 }
-
 function updateReimbMetrics(){
   const year=new Date().getFullYear().toString();
-  const pending=reimbs.filter(r=>r.status==='pending').reduce((s,r)=>s+parseFloat(r.amount),0);
-  const approved=reimbs.filter(r=>r.status==='approved'&&r.date.startsWith(year)).reduce((s,r)=>s+parseFloat(r.amount),0);
-  document.getElementById('r-pending').textContent='$'+pending.toFixed(2);
-  document.getElementById('r-approved').textContent='$'+approved.toFixed(2);
+  document.getElementById('r-pending').textContent='$'+reimbs.filter(r=>r.status==='pending').reduce((s,r)=>s+r.amount,0).toFixed(2);
+  document.getElementById('r-approved').textContent='$'+reimbs.filter(r=>r.status==='approved'&&r.date.startsWith(year)).reduce((s,r)=>s+r.amount,0).toFixed(2);
 }
-
 function exportReimbCSV(){
   const rows=[['Date','Description','Category','Amount ($)','Status','Notes']];
   reimbs.forEach(r=>rows.push([r.date,r.desc,reimbCats[r.category]||r.category,parseFloat(r.amount).toFixed(2),r.status,r.notes||'']));
   downloadCSV(rows,'reimbursements.csv');
 }
 
-// ── CSV ───────────────────────────────────────────────────────────────────────
+// CSV
 function downloadCSV(rows,filename){
-  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download=filename; a.click();
+  a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n')],{type:'text/csv'}));
+  a.download=filename;a.click();
 }
 
-// ── PIN LOCK ──────────────────────────────────────────────────────────────────
-const CORRECT_PIN = '1194';
-const MAX_ATTEMPTS = 3;
-const LOCK_DURATION = 5 * 60 * 1000;
-let pinEntry = '';
-let pinAttempts = parseInt(localStorage.getItem('pin_attempts') || '0');
-let pinLockedUntil = parseInt(localStorage.getItem('pin_locked_until') || '0');
-
-function checkPinLock() {
-  const now = Date.now();
-  if (pinLockedUntil && now < pinLockedUntil) {
-    showLockTimer();
-    return true;
-  }
-  if (pinLockedUntil && now >= pinLockedUntil) {
-    pinAttempts = 0;
-    localStorage.removeItem('pin_attempts');
-    localStorage.removeItem('pin_locked_until');
-    pinLockedUntil = 0;
-  }
-  return false;
+// INIT
+function initApp(){
+  document.getElementById('home-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('f-date').value=TODAY;
+  document.getElementById('i-date').value=TODAY;
+  document.getElementById('s-date').value=TODAY;
+  document.getElementById('r-date').value=TODAY;
+  renderBaseSelect();
+  loadAll();
 }
 
-function showLockTimer() {
-  const remaining = Math.ceil((pinLockedUntil - Date.now()) / 1000);
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
-  document.getElementById('pin-locked').textContent = `Too many attempts. Try again in ${mins}:${secs.toString().padStart(2,'0')}`;
-  document.getElementById('pin-error').textContent = '';
-  if (Date.now() < pinLockedUntil) setTimeout(showLockTimer, 1000);
-  else { document.getElementById('pin-locked').textContent = ''; pinAttempts = 0; }
-}
-
-function pinPress(digit) {
-  if (checkPinLock()) return;
-  if (pinEntry.length >= 4) return;
-  pinEntry += digit;
-  updatePinDots();
-  if (pinEntry.length === 4) setTimeout(checkPin, 150);
-}
-
-function pinDel() {
-  if (checkPinLock()) return;
-  pinEntry = pinEntry.slice(0, -1);
-  updatePinDots();
-  document.getElementById('pin-error').textContent = '';
-}
-
-function updatePinDots(state) {
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('pd' + i);
-    dot.classList.remove('filled', 'error');
-    if (state === 'error') dot.classList.add('error');
-    else if (i < pinEntry.length) dot.classList.add('filled');
-  }
-}
-
-function checkPin() {
-  if (pinEntry === CORRECT_PIN) {
-    pinAttempts = 0;
-    localStorage.removeItem('pin_attempts');
-    localStorage.removeItem('pin_locked_until');
-    localStorage.setItem('pin_unlocked_until', Date.now() + 8 * 60 * 60 * 1000);
+// BOOT
+(function(){
+  const unlocked=parseInt(localStorage.getItem('pin_unlocked_until')||'0');
+  if(Date.now()<unlocked){
     document.getElementById('pin-screen').classList.add('hidden');
-    loadAll();
-  } else {
-    pinAttempts++;
-    localStorage.setItem('pin_attempts', pinAttempts);
-    updatePinDots('error');
-    if (pinAttempts >= MAX_ATTEMPTS) {
-      pinLockedUntil = Date.now() + LOCK_DURATION;
-      localStorage.setItem('pin_locked_until', pinLockedUntil);
-      document.getElementById('pin-error').textContent = '';
-      showLockTimer();
-    } else {
-      document.getElementById('pin-error').textContent = `Incorrect PIN. ${MAX_ATTEMPTS - pinAttempts} attempt${MAX_ATTEMPTS - pinAttempts === 1 ? '' : 's'} remaining.`;
-    }
-    setTimeout(() => { pinEntry = ''; updatePinDots(); }, 600);
+    document.getElementById('app').classList.add('visible');
+    initApp();return;
   }
-}
-
-function initPin() {
-  const unlockedUntil = parseInt(localStorage.getItem('pin_unlocked_until') || '0');
-  if (Date.now() < unlockedUntil) {
-    document.getElementById('pin-screen').classList.add('hidden');
-    loadAll();
-    return;
-  }
-  if (checkPinLock()) showLockTimer();
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-initPin();
+  if(checkPinLock())showLockTimer();
+})();
 </script>
 </body>
 </html>
