@@ -278,8 +278,8 @@
     <div class="card-title">Log a trip</div>
     <div class="base-row">
       <span style="font-size:15px;">&#127968;</span>
-      <span class="base-val" id="base-display">Parish house</span>
-      <button class="base-edit" onclick="editBase()">&#9998; Change</button>
+      <select id="base-select" onchange="selectBase()" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-size:14px;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;"></select>
+      <button class="base-edit" onclick="editAddresses()">&#9998; Edit</button>
     </div>
     <div class="field">
       <label>Date</label>
@@ -466,7 +466,7 @@ const SA = {
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let trips=[], intentions=[], reimbs=[];
-let baseAddress = localStorage.getItem('parish_base')||'Parish house';
+let baseAddress = 'Parish house';
 let mileFilter='all', intFilter='upcoming';
 let accessToken=null, tokenExpiry=0;
 const purposeLabels={pastoral:'Pastoral',hospital:'Hospital',school:'School',admin:'Admin',other:'Other'};
@@ -565,13 +565,41 @@ function showPage(name,btn){
 }
 
 // ── MILEAGE ───────────────────────────────────────────────────────────────────
-document.getElementById('base-display').textContent=baseAddress;
-document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+let savedAddresses = JSON.parse(localStorage.getItem('parish_addresses')||'null') || [
+  {label:'Rectory', address:''},
+  {label:'Church', address:''}
+];
 
-function editBase(){
-  const v=prompt('Enter your usual starting address:',baseAddress);
-  if(v&&v.trim()){baseAddress=v.trim();localStorage.setItem('parish_base',baseAddress);document.getElementById('base-display').textContent=baseAddress;}
+function renderBaseSelect(){
+  const sel = document.getElementById('base-select');
+  sel.innerHTML = savedAddresses.map((a,i)=>
+    `<option value="${i}">${a.label}${a.address?' — '+a.address.split(',')[0]:' (tap Edit to set address)'}</option>`
+  ).join('');
+  const saved = parseInt(localStorage.getItem('parish_base_idx')||'0');
+  sel.value = saved < savedAddresses.length ? saved : 0;
+  baseAddress = savedAddresses[sel.value].address || savedAddresses[sel.value].label;
 }
+
+function selectBase(){
+  const idx = document.getElementById('base-select').value;
+  localStorage.setItem('parish_base_idx', idx);
+  baseAddress = savedAddresses[idx].address || savedAddresses[idx].label;
+}
+
+function editAddresses(){
+  savedAddresses.forEach((a,i)=>{
+    const lbl = prompt(`Name for address ${i+1} (e.g. Rectory):`, a.label);
+    if(lbl && lbl.trim()) savedAddresses[i].label = lbl.trim();
+    const addr = prompt(`Full address for "${savedAddresses[i].label}":`, a.address);
+    if(addr !== null) savedAddresses[i].address = addr.trim();
+  });
+  localStorage.setItem('parish_addresses', JSON.stringify(savedAddresses));
+  renderBaseSelect();
+  toast('Addresses saved ✓');
+}
+
+renderBaseSelect();
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
 
 async function calcDistance(){
   const to=document.getElementById('f-to').value.trim();
