@@ -128,6 +128,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .status-approved{background:var(--teal-light);color:var(--teal);}
 .empty{text-align:center;padding:32px 0;color:var(--muted);font-size:14px;}
 
+/* AUTOCOMPLETE */
+.autocomplete-wrap{position:relative;}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--purple-mid);border-radius:var(--radius-sm);z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.12);max-height:200px;overflow-y:auto;margin-top:2px;}
+.autocomplete-item{padding:12px 14px;font-size:14px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.autocomplete-item:last-child{border-bottom:none;}
+.autocomplete-item:active{background:var(--purple-light);}
+.autocomplete-icon{font-size:14px;flex-shrink:0;}
+
 /* CALENDAR */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-nav{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
@@ -266,14 +274,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
         <div class="field"><label>Purpose</label>
           <select id="f-purpose">
+            <option value="anointing">Anointing of the sick</option>
             <option value="pastoral">Pastoral visit</option>
-            <option value="hospital">Hospital / sick call</option>
-            <option value="school">School visit</option>
-            <option value="admin">Admin / deanery</option>
-            <option value="other">Other ministry</option>
+            <option value="blessing">House blessing</option>
+            <option value="deanery">Deanery meeting</option>
+            <option value="diocesan">Diocesan events</option>
           </select>
         </div>
-        <div class="field"><label>Destination address</label><input type="text" id="f-to" placeholder="e.g. 123 Main St, Denver, CO"/></div>
+        <div class="field"><label>Destination address</label>
+          <div class="autocomplete-wrap">
+            <input type="text" id="f-to" placeholder="e.g. UCHealth, St Joseph Church…" onfocus="showSuggestions()" onblur="hideSuggestions()" autocomplete="off"/>
+            <div class="autocomplete-list" id="autocomplete-list" style="display:none;"></div>
+          </div>
+        </div>
         <div id="dist-info" class="dist-info"></div>
         <div class="miles-calc-row">
           <div class="field"><label>Miles (round trip)</label><input type="number" id="f-miles" placeholder="or enter manually" min="0" step="0.1" inputmode="decimal"/></div>
@@ -288,11 +301,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-title">Trip log</div>
         <div class="filter-row">
           <button class="fbtn active" onclick="setMileFilter('all',this)">All</button>
+          <button class="fbtn" onclick="setMileFilter('anointing',this)">Anointing</button>
           <button class="fbtn" onclick="setMileFilter('pastoral',this)">Pastoral</button>
-          <button class="fbtn" onclick="setMileFilter('hospital',this)">Hospital</button>
-          <button class="fbtn" onclick="setMileFilter('school',this)">School</button>
-          <button class="fbtn" onclick="setMileFilter('admin',this)">Admin</button>
-          <button class="fbtn" onclick="setMileFilter('other',this)">Other</button>
+          <button class="fbtn" onclick="setMileFilter('blessing',this)">Blessing</button>
+          <button class="fbtn" onclick="setMileFilter('deanery',this)">Deanery</button>
+          <button class="fbtn" onclick="setMileFilter('diocesan',this)">Diocesan</button>
         </div>
         <div id="trip-log"><div class="empty">Loading trips…</div></div>
       </div>
@@ -451,8 +464,8 @@ let accessToken=null,tokenExpiry=0;
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
 let selectedCalDate=null;
 const TODAY=new Date().toISOString().split('T')[0];
-const purposeLabels={pastoral:'Pastoral',hospital:'Hospital',school:'School',admin:'Admin',other:'Other'};
-const purposeClass={pastoral:'b-pastoral',hospital:'b-hospital',school:'b-school',admin:'b-admin',other:'b-other'};
+const purposeLabels={anointing:'Anointing of sick',pastoral:'Pastoral visit',blessing:'House blessing',deanery:'Deanery meeting',diocesan:'Diocesan events'};
+const purposeClass={anointing:'b-hospital',pastoral:'b-pastoral',blessing:'b-school',deanery:'b-admin',diocesan:'b-other'};
 const stoleLabels={wedding:'Wedding',funeral:'Funeral',baptism:'Baptism',stipend:'Stipend',blessing:'Blessing/Other'};
 const reimbCats={liturgical:'Liturgical',travel:'Travel',office:'Office',pastoral:'Pastoral care',other:'Other'};
 
@@ -637,6 +650,73 @@ function editAddresses(){
   renderBaseSelect();toast('Addresses saved ✓');
 }
 
+// AUTOCOMPLETE — Google Places + recent history
+let placesAutocomplete=null;
+
+function getSavedDestinations(){
+  return JSON.parse(localStorage.getItem('parish_destinations')||'[]');
+}
+function saveDestination(addr){
+  if(!addr||addr.length<5)return;
+  let saved=getSavedDestinations();
+  saved=saved.filter(d=>d.toLowerCase()!==addr.toLowerCase());
+  saved.unshift(addr);
+  if(saved.length>50)saved=saved.slice(0,50);
+  localStorage.setItem('parish_destinations',JSON.stringify(saved));
+}
+
+function initPlacesAutocomplete(){
+  const input=document.getElementById('f-to');
+  if(!input||typeof google==='undefined'||!google.maps||!google.maps.places)return;
+  // Google Places Autocomplete
+  placesAutocomplete=new google.maps.places.Autocomplete(input,{
+    types:['establishment','geocode'],
+    fields:['formatted_address','name','geometry']
+  });
+  placesAutocomplete.addListener('place_changed',()=>{
+    const place=placesAutocomplete.getPlace();
+    if(place&&place.formatted_address){
+      // Show name + address e.g. "UCHealth — 1724 Gilpin St, Denver, CO"
+      const display=place.name&&place.name!==place.formatted_address
+        ? place.formatted_address
+        : place.formatted_address;
+      input.value=display;
+      saveDestination(display);
+    }
+  });
+  // Style the Google autocomplete dropdown to match app
+  const style=document.createElement('style');
+  style.textContent=`.pac-container{border-radius:12px;border:1px solid #AFA9EC;box-shadow:0 4px 16px rgba(0,0,0,0.12);font-family:'DM Sans',sans-serif;margin-top:2px;}.pac-item{padding:10px 14px;font-size:14px;cursor:pointer;}.pac-item:hover{background:#EEEDFE;}.pac-item-query{font-size:14px;color:#1a1a1a;}.pac-icon{display:none;}`;
+  document.head.appendChild(style);
+}
+
+function showSuggestions(){
+  // Show recent destinations when field is tapped and empty
+  const input=document.getElementById('f-to');
+  const list=document.getElementById('autocomplete-list');
+  if(input.value.trim().length>0){list.style.display='none';return;}
+  const saved=getSavedDestinations().slice(0,5);
+  if(!saved.length){list.style.display='none';return;}
+  list.innerHTML='<div style="padding:8px 14px 4px;font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;">Recent</div>'+
+    saved.map(d=>`<div class="autocomplete-item" onmousedown="pickSuggestion('${d.replace(/'/g,"\'").replace(/"/g,'&quot;')}')"><span class="autocomplete-icon">🕐</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d}</span></div>`).join('');
+  list.style.display='block';
+}
+function pickSuggestion(val){
+  document.getElementById('f-to').value=val;
+  document.getElementById('autocomplete-list').style.display='none';
+}
+function hideSuggestions(){
+  setTimeout(()=>{
+    const list=document.getElementById('autocomplete-list');
+    if(list)list.style.display='none';
+  },250);
+}
+
+// Init Places once Maps API is ready
+function onMapsReady(){
+  initPlacesAutocomplete();
+}
+
 // MILEAGE
 function fmtDate(d){if(!d)return '';const[y,m,day]=d.split('-');return `${m}/${day}/${y.slice(2)}`;}
 
@@ -683,6 +763,7 @@ async function addTrip(){
   try{
     await sheetsAppend('Mileage!A:G',[[date,baseAddress,to,purpose,miles.toFixed(1),(miles*RATE).toFixed(2),notes]]);
     trips.unshift({date,from:baseAddress,to,purpose,miles,notes});
+    saveDestination(to);
     document.getElementById('f-miles').value='';document.getElementById('f-to').value='';document.getElementById('f-notes').value='';
     document.getElementById('dist-info').style.display='none';
     setSyncBadge('ok');toast('Trip saved ✓');
@@ -966,6 +1047,6 @@ function initApp(){
   if(checkPinLock())showLockTimer();
 })();
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU&libraries=geometry" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU&libraries=places&callback=onMapsReady" async defer></script>
 </body>
 </html>
