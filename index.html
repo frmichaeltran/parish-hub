@@ -640,22 +640,36 @@ function editAddresses(){
 // MILEAGE
 function fmtDate(d){if(!d)return '';const[y,m,day]=d.split('-');return `${m}/${day}/${y.slice(2)}`;}
 
-async function calcDistance(){
+function calcDistance(){
   const to=document.getElementById('f-to').value.trim();
   if(!to){alert('Enter a destination first.');return;}
+  if(!baseAddress||baseAddress==='Parish house'){alert('Please set your starting address first — tap the Edit button next to the address selector.');return;}
   const btn=document.getElementById('calc-btn');
   btn.disabled=true;btn.textContent='Calculating…';
-  try{
-    const url=`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(baseAddress)}&destinations=${encodeURIComponent(to)}&units=imperial&key=${API_KEY_MAPS}`;
-    const d=await(await fetch(url)).json();
-    if(d.status==='OK'&&d.rows[0].elements[0].status==='OK'){
-      const ow=d.rows[0].elements[0].distance.value/1609.344,rt=ow*2;
+  if(typeof google==='undefined'||!google.maps){
+    toast('Maps not loaded yet — try again in a moment','err');
+    btn.disabled=false;btn.textContent='📍 Calculate';
+    return;
+  }
+  const svc=new google.maps.DistanceMatrixService();
+  svc.getDistanceMatrix({
+    origins:[baseAddress],
+    destinations:[to],
+    travelMode:google.maps.TravelMode.DRIVING,
+    unitSystem:google.maps.UnitSystem.IMPERIAL
+  },function(resp,status){
+    btn.disabled=false;btn.textContent='📍 Calculate';
+    if(status==='OK'&&resp.rows[0].elements[0].status==='OK'){
+      const metres=resp.rows[0].elements[0].distance.value;
+      const ow=metres/1609.344,rt=ow*2;
       document.getElementById('f-miles').value=rt.toFixed(1);
       const info=document.getElementById('dist-info');
-      info.style.display='block';info.textContent=`One way: ${ow.toFixed(1)} mi · Round trip: ${rt.toFixed(1)} mi`;
-    }else toast('Address not found — try adding city & state','err');
-  }catch(e){toast('Network error','err');}
-  btn.disabled=false;btn.textContent='📍 Calculate';
+      info.style.display='block';
+      info.textContent=`One way: ${ow.toFixed(1)} mi · Round trip: ${rt.toFixed(1)} mi`;
+    }else{
+      toast('Address not found — try adding city & state','err');
+    }
+  });
 }
 
 async function addTrip(){
@@ -952,5 +966,6 @@ function initApp(){
   if(checkPinLock())showLockTimer();
 })();
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU&libraries=geometry" async defer></script>
 </body>
 </html>
