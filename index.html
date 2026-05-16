@@ -39,28 +39,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #app.visible{display:block;}
 
 /* HOME */
-#page-home{min-height:100vh;}
-.home-header{padding:52px 24px 28px;background:linear-gradient(160deg,#1a1433 0%,#2d2660 100%);}
+#page-home{min-height:100vh;background:linear-gradient(180deg,#1a1433 0%,#2d2660 45%,#f0eef8 45%);}
+.home-header{padding:52px 24px 24px;}
 .home-cross{font-size:28px;margin-bottom:10px;}
 .home-quote{font-family:'Lora',serif;font-size:20px;color:#fff;font-weight:400;font-style:italic;line-height:1.55;opacity:0.92;}
-.home-date{font-size:12px;color:rgba(255,255,255,0.35);margin-top:12px;}
-.home-list{display:flex;flex-direction:column;gap:12px;padding:20px 16px 16px;}
-.home-btn{background:var(--card);border-radius:18px;border:1px solid var(--border);padding:18px 20px;display:flex;flex-direction:row;align-items:center;gap:14px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
-.home-btn:active{transform:scale(0.98);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-.home-btn:nth-child(1){background:#FEFAE8;}
-.home-btn:nth-child(2){background:#f0f0f0;}
-.home-btn:nth-child(3){background:#E8F5EC;}
-.home-btn:nth-child(4){background:#E8F4FB;}
-.home-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
-.icon-mileage{background:rgba(255,255,255,0.6);}
-.icon-intentions{background:rgba(255,255,255,0.6);}
-.icon-stole{background:rgba(255,255,255,0.6);}
-.icon-reimb{background:rgba(255,255,255,0.6);}
-.home-btn-text{flex:1;}
-.home-btn-title{font-size:16px;font-weight:500;color:var(--text);line-height:1.2;}
-.home-btn-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-.home-arrow{font-size:22px;color:rgba(0,0,0,0.2);font-weight:300;}
-.sync-row{display:flex;align-items:center;justify-content:center;padding:8px 16px 24px;}
+.home-date{font-size:12px;color:rgba(255,255,255,0.35);margin-top:10px;}
+.home-list{display:flex;flex-direction:column;gap:14px;padding:20px 16px 32px;}
+.home-btn{background:#fff;border-radius:20px;border:none;padding:0;display:flex;flex-direction:row;align-items:stretch;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.10);overflow:hidden;min-height:100px;}
+.home-btn:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(0,0,0,0.10);}
+.home-btn-icon-area{width:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.home-btn:nth-child(1) .home-btn-icon-area{background:linear-gradient(135deg,#FEF3C7,#FDE68A);}
+.home-btn:nth-child(2) .home-btn-icon-area{background:linear-gradient(135deg,#E0E7FF,#C7D2FE);}
+.home-btn:nth-child(3) .home-btn-icon-area{background:linear-gradient(135deg,#D1FAE5,#A7F3D0);}
+.home-btn:nth-child(4) .home-btn-icon-area{background:linear-gradient(135deg,#DBEAFE,#BFDBFE);}
+.home-btn-text{flex:1;padding:18px 16px;display:flex;flex-direction:column;justify-content:center;text-align:left;}
+.home-btn-title{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:4px;}
+.home-btn-sub{font-size:12px;color:var(--muted);line-height:1.4;}
+.home-btn-arrow{padding:18px 14px 18px 0;display:flex;align-items:center;font-size:20px;color:#ccc;}
+.sync-row{display:flex;align-items:center;justify-content:center;padding:0 16px 24px;}
 .sync-pill{font-size:11px;padding:5px 14px;border-radius:20px;background:var(--teal-light);color:var(--teal);font-weight:500;}
 .sync-pill.syncing{background:var(--amber-light);color:var(--amber);}
 .sync-pill.error{background:var(--red-light);color:var(--red);}
@@ -225,36 +221,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="home-list">
       <div class="home-btn" onclick="openPage('mileage')">
-        <div class="home-icon icon-mileage">🚗</div>
+        <div class="home-btn-icon-area">🚗</div>
         <div class="home-btn-text">
           <div class="home-btn-title">Mileage</div>
           <div class="home-btn-sub" id="hb-mileage">Tax deductions</div>
         </div>
-        <div class="home-arrow">›</div>
+        <div class="home-btn-arrow">›</div>
       </div>
       <div class="home-btn" onclick="openPage('intentions')">
-        <div class="home-icon icon-intentions">🕯️</div>
+        <div class="home-btn-icon-area">🕯️</div>
         <div class="home-btn-text">
           <div class="home-btn-title">Mass intentions</div>
           <div class="home-btn-sub" id="hb-intentions">Daily calendar</div>
         </div>
-        <div class="home-arrow">›</div>
+        <div class="home-btn-arrow">›</div>
       </div>
       <div class="home-btn" onclick="openPage('stole')">
-        <div class="home-icon icon-stole">💵</div>
+        <div class="home-btn-icon-area">💵</div>
         <div class="home-btn-text">
           <div class="home-btn-title">Stole fees</div>
           <div class="home-btn-sub" id="hb-stole">Outside income</div>
         </div>
-        <div class="home-arrow">›</div>
+        <div class="home-btn-arrow">›</div>
       </div>
       <div class="home-btn" onclick="openPage('reimb')">
-        <div class="home-icon icon-reimb">🧾</div>
+        <div class="home-btn-icon-area">🧾</div>
         <div class="home-btn-text">
           <div class="home-btn-title">Reimbursements</div>
           <div class="home-btn-sub" id="hb-reimb">Expense tracking</div>
         </div>
-        <div class="home-arrow">›</div>
+        <div class="home-btn-arrow">›</div>
       </div>
     </div>
     <div class="sync-row">
