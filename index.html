@@ -403,7 +403,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="field"><label>Amount ($)</label><input type="number" id="s-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
           <div class="field"><label>Date</label><input type="date" id="s-date"/></div>
         </div>
-        <div class="field"><label>From / occasion</label><input type="text" id="s-from" placeholder="e.g. Smith wedding"/></div>
+        <div class="field"><label>From / occasion</label>
+          <div class="autocomplete-wrap">
+            <input type="text" id="s-from" placeholder="e.g. Smith wedding, St Joseph Parish…"
+              onfocus="showHistory('stole_from','s-from','s-from-list')"
+              oninput="showHistory('stole_from','s-from','s-from-list')"
+              onblur="hideHistory('s-from-list')" autocomplete="off"/>
+            <div class="autocomplete-list" id="s-from-list" style="display:none;"></div>
+          </div>
+        </div>
         <div class="field"><label>Check # (optional)</label><input type="text" id="s-checknum" placeholder="e.g. 1042"/></div>
         <div class="field"><label>Notes (optional)</label><input type="text" id="s-notes" placeholder="e.g. Cash received"/></div>
         <button class="btn btn-primary" onclick="addStole()">+ Record fee</button>
@@ -498,8 +506,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-title">Part I — Expenses</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Date · Who did you pay? · Purpose · Amount</div>
         <div class="field"><label>Date</label><input type="date" id="r-date"/></div>
-        <div class="field"><label>Who did you pay?</label><input type="text" id="r-payee" placeholder="e.g. Amazon, Dollar Tree, CVS"/></div>
-        <div class="field"><label>Purpose</label><input type="text" id="r-purpose" placeholder="e.g. Altar candles for Easter Mass"/></div>
+        <div class="field"><label>Who did you pay?</label>
+          <div class="autocomplete-wrap">
+            <input type="text" id="r-payee" placeholder="e.g. Amazon, Dollar Tree, CVS"
+              onfocus="showHistory('reimb_payee','r-payee','r-payee-list')"
+              oninput="showHistory('reimb_payee','r-payee','r-payee-list')"
+              onblur="hideHistory('r-payee-list')" autocomplete="off"/>
+            <div class="autocomplete-list" id="r-payee-list" style="display:none;"></div>
+          </div>
+        </div>
+        <div class="field"><label>Purpose</label>
+          <div class="autocomplete-wrap">
+            <input type="text" id="r-purpose" placeholder="e.g. Altar candles for Easter Mass"
+              onfocus="showHistory('reimb_purpose','r-purpose','r-purpose-list')"
+              oninput="showHistory('reimb_purpose','r-purpose','r-purpose-list')"
+              onblur="hideHistory('r-purpose-list')" autocomplete="off"/>
+            <div class="autocomplete-list" id="r-purpose-list" style="display:none;"></div>
+          </div>
+        </div>
         <div class="field"><label>Amount ($)</label><input type="number" id="r-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
         <button class="btn btn-primary" onclick="addReimb()">+ Add expense</button>
       </div>
@@ -756,6 +780,43 @@ function editAddresses(){
   renderBaseSelect();toast('Addresses saved ✓');
 }
 
+// HISTORY SUGGESTIONS — generic reusable system
+function getHistory(key){ return JSON.parse(localStorage.getItem('hist_'+key)||'[]'); }
+function saveHistory(key, val){
+  if(!val||val.trim().length<2)return;
+  let h=getHistory(key);
+  h=h.filter(v=>v.toLowerCase()!==val.toLowerCase());
+  h.unshift(val.trim());
+  if(h.length>60)h=h.slice(0,60);
+  localStorage.setItem('hist_'+key, JSON.stringify(h));
+}
+function showHistory(key, inputId, listId){
+  const input=document.getElementById(inputId);
+  const list=document.getElementById(listId);
+  if(!input||!list)return;
+  const val=input.value.trim().toLowerCase();
+  const h=getHistory(key);
+  const matches=val.length===0
+    ? h.slice(0,6)
+    : h.filter(v=>v.toLowerCase().includes(val)).slice(0,6);
+  if(!matches.length){list.style.display='none';return;}
+  const label=val.length===0
+    ? '<div style="padding:8px 14px 4px;font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;">Recent</div>'
+    : '';
+  list.innerHTML=label+matches.map(v=>`<div class="autocomplete-item" onmousedown="pickHistory('${inputId}','${listId}','${v.replace(/'/g,"\'").replace(/"/g,'&quot;')}','${key}')""><span class="autocomplete-icon">🕐</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v}</span></div>`).join('');
+  list.style.display='block';
+}
+function pickHistory(inputId, listId, val, key){
+  document.getElementById(inputId).value=val;
+  document.getElementById(listId).style.display='none';
+}
+function hideHistory(listId){
+  setTimeout(()=>{
+    const l=document.getElementById(listId);
+    if(l)l.style.display='none';
+  },250);
+}
+
 // AUTOCOMPLETE — Google Places + recent history
 let placesAutocomplete=null;
 
@@ -774,22 +835,38 @@ function saveDestination(addr){
 function initPlacesAutocomplete(){
   const input=document.getElementById('f-to');
   if(!input||typeof google==='undefined'||!google.maps||!google.maps.places)return;
-  // Google Places Autocomplete
-  placesAutocomplete=new google.maps.places.Autocomplete(input,{
+
+  // Try to get coordinates from saved base address for location bias
+  const geocoder=new google.maps.Geocoder();
+  const options={
     types:['establishment','geocode'],
     fields:['formatted_address','name','geometry']
-  });
+  };
+
+  placesAutocomplete=new google.maps.places.Autocomplete(input, options);
+
+  // Bias to within ~30 miles of base address
+  function biasToBase(){
+    if(!baseAddress||baseAddress==='Parish house')return;
+    geocoder.geocode({address:baseAddress},function(results,status){
+      if(status==='OK'&&results[0]){
+        const loc=results[0].geometry.location;
+        const circle=new google.maps.Circle({center:loc,radius:48000}); // ~30 miles
+        placesAutocomplete.setBounds(circle.getBounds());
+        placesAutocomplete.setOptions({strictBounds:false});
+      }
+    });
+  }
+  biasToBase();
+
   placesAutocomplete.addListener('place_changed',()=>{
     const place=placesAutocomplete.getPlace();
     if(place&&place.formatted_address){
-      // Show name + address e.g. "UCHealth — 1724 Gilpin St, Denver, CO"
-      const display=place.name&&place.name!==place.formatted_address
-        ? place.formatted_address
-        : place.formatted_address;
-      input.value=display;
-      saveDestination(display);
+      input.value=place.formatted_address;
+      saveDestination(place.formatted_address);
     }
   });
+
   // Style the Google autocomplete dropdown to match app
   const style=document.createElement('style');
   style.textContent=`.pac-container{border-radius:12px;border:1px solid #AFA9EC;box-shadow:0 4px 16px rgba(0,0,0,0.12);font-family:'DM Sans',sans-serif;margin-top:2px;}.pac-item{padding:10px 14px;font-size:14px;cursor:pointer;}.pac-item:hover{background:#EEEDFE;}.pac-item-query{font-size:14px;color:#1a1a1a;}.pac-icon{display:none;}`;
@@ -1146,6 +1223,7 @@ async function addStole(){
     await sheetsAppend('StoleFees!A:G',[[date,type,amt.toFixed(2),from,checknum,notes,'']]);
     const checknum2=document.getElementById('s-checknum').value.trim();
     stoles.unshift({date,type,amount:amt,from,checknum:checknum2,notes});
+    saveHistory('stole_from', document.getElementById('s-from').value);
     document.getElementById('s-amt').value='';document.getElementById('s-from').value='';document.getElementById('s-notes').value='';document.getElementById('s-checknum').value='';
     setSyncBadge('ok');toast('Stole fee saved ✓');
     renderStoles();updateStoleMetrics();updateHomeCards();
@@ -1258,6 +1336,8 @@ async function addReimb(){
   try{
     await sheetsAppend('Reimbursements!A:E',[[date,payee,purpose,amt.toFixed(2),'']]);
     reimbs.unshift({date,payee,purpose,amount:amt,notes:''});
+    saveHistory('reimb_payee', document.getElementById('r-payee').value);
+    saveHistory('reimb_purpose', document.getElementById('r-purpose').value);
     document.getElementById('r-payee').value='';
     document.getElementById('r-purpose').value='';
     document.getElementById('r-amt').value='';
