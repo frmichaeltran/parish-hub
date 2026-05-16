@@ -286,10 +286,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="field"><label>Purpose</label>
           <select id="f-purpose">
             <option value="anointing">Anointing of the sick</option>
-            <option value="pastoral">Pastoral visit</option>
             <option value="blessing">House blessing</option>
-            <option value="deanery">Deanery meeting</option>
-            <option value="diocesan">Diocesan events</option>
+            <option value="diocesan">Diocesan meeting / event</option>
+            <option value="mass">Mass / Penance service</option>
           </select>
         </div>
         <div class="field"><label>Destination address</label>
@@ -316,10 +315,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="filter-row">
           <button class="fbtn active" onclick="setMileFilter('all',this)">All</button>
           <button class="fbtn" onclick="setMileFilter('anointing',this)">Anointing</button>
-          <button class="fbtn" onclick="setMileFilter('pastoral',this)">Pastoral</button>
           <button class="fbtn" onclick="setMileFilter('blessing',this)">Blessing</button>
-          <button class="fbtn" onclick="setMileFilter('deanery',this)">Deanery</button>
           <button class="fbtn" onclick="setMileFilter('diocesan',this)">Diocesan</button>
+          <button class="fbtn" onclick="setMileFilter('mass',this)">Mass/Penance</button>
         </div>
         <div id="trip-log"><div class="empty">Loading trips…</div></div>
       </div>
@@ -525,10 +523,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="field"><label>Purpose</label>
           <select id="rm-purpose">
             <option value="anointing">Anointing of the sick</option>
-            <option value="pastoral">Pastoral visit</option>
             <option value="blessing">House blessing</option>
-            <option value="deanery">Deanery meeting</option>
-            <option value="diocesan">Diocesan events</option>
+            <option value="diocesan">Diocesan meeting / event</option>
+            <option value="mass">Mass / Penance service</option>
           </select>
         </div>
         <div class="field"><label>Destination address</label>
@@ -566,8 +563,8 @@ let accessToken=null,tokenExpiry=0;
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
 let selectedCalDate=null;
 const TODAY=new Date().toISOString().split('T')[0];
-const purposeLabels={anointing:'Anointing of sick',pastoral:'Pastoral visit',blessing:'House blessing',deanery:'Deanery meeting',diocesan:'Diocesan events'};
-const purposeClass={anointing:'b-hospital',pastoral:'b-pastoral',blessing:'b-school',deanery:'b-admin',diocesan:'b-other'};
+const purposeLabels={anointing:'Anointing of sick',blessing:'House blessing',diocesan:'Diocesan meeting/event',mass:'Mass/Penance service'};
+const purposeClass={anointing:'b-hospital',blessing:'b-school',diocesan:'b-admin',mass:'b-pastoral'};
 const stoleLabels={stipend:'Mass stipend',funeral:'Funeral',wedding:'Wedding',baptism:'Baptism',blessing:'Blessing/Other'};
 const reimbCats={liturgical:'Liturgical',travel:'Travel',office:'Office',pastoral:'Pastoral care',other:'Other'};
 
