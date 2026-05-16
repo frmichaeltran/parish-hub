@@ -477,34 +477,95 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="page-topbar-title">🧾 Reimbursements</div>
     </div>
     <div class="page-content">
+
+      <!-- METRICS -->
       <div class="metrics">
-        <div class="metric"><div class="metric-label">Pending</div><div class="metric-val" id="r-pending">—</div><div class="metric-sub">awaiting approval</div></div>
-        <div class="metric"><div class="metric-label">Approved YTD</div><div class="metric-val" id="r-approved">—</div><div class="metric-sub">this year</div></div>
+        <div class="metric"><div class="metric-label">Expenses this month</div><div class="metric-val" id="r-exp-total">—</div><div class="metric-sub">Part I</div></div>
+        <div class="metric"><div class="metric-label">Mileage this month</div><div class="metric-val" id="r-mile-total">—</div><div class="metric-sub">Part II · church reimb.</div></div>
+        <div class="metric"><div class="metric-label">Total to claim</div><div class="metric-val" id="r-grand-total">—</div><div class="metric-sub">expenses + mileage</div></div>
+        <div class="metric"><div class="metric-label">Church miles</div><div class="metric-val" id="r-mile-count">—</div><div class="metric-sub">this month</div></div>
+      </div>
+
+      <!-- OLV FORM GENERATOR -->
+      <div class="card" style="background:#EEEDFE;border-color:#AFA9EC;">
+        <div class="card-title" style="color:#534AB7;">📄 Generate OLV Form</div>
+        <div style="font-size:13px;color:#534AB7;margin-bottom:12px;line-height:1.5;">Fills the official OLV form with your Part I expenses and Part II church mileage for the selected month.</div>
+        <div class="row2" style="margin-bottom:12px;">
+          <div class="field" style="margin-bottom:0;"><label>Month</label>
+            <select id="gen-month" style="background:#fff;" onchange="updateGenPreview()">
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0;"><label>Year</label>
+            <select id="gen-year" style="background:#fff;" onchange="updateGenPreview()">
+              <option value="2024">2024</option><option value="2025">2025</option>
+              <option value="2026" selected>2026</option><option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+        <div id="gen-preview" style="font-size:12px;color:#534AB7;margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;display:none;line-height:1.6;"></div>
+        <button class="btn" style="background:#534AB7;color:#fff;margin-bottom:0;" onclick="generateOLVForm()">📄 Generate &amp; Download OLV Form</button>
+      </div>
+
+      <!-- PART I — EXPENSES -->
+      <div class="card">
+        <div class="card-title">Part I — Expenses</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Date · Who did you pay? · Purpose · Amount</div>
+        <div class="field"><label>Date</label><input type="date" id="r-date"/></div>
+        <div class="field"><label>Who did you pay?</label><input type="text" id="r-payee" placeholder="e.g. Amazon, Dollar Tree, CVS"/></div>
+        <div class="field"><label>Purpose</label><input type="text" id="r-purpose" placeholder="e.g. Altar candles for Easter Mass"/></div>
+        <div class="field"><label>Amount ($)</label><input type="number" id="r-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
+        <button class="btn btn-primary" onclick="addReimb()">+ Add expense</button>
       </div>
       <div class="card">
-        <div class="card-title">New reimbursement</div>
-        <div class="field"><label>Description</label><input type="text" id="r-desc" placeholder="e.g. Altar candles"/></div>
-        <div class="row2">
-          <div class="field"><label>Amount ($)</label><input type="number" id="r-amt" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/></div>
-          <div class="field"><label>Date</label><input type="date" id="r-date"/></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">Part I log</div>
         </div>
-        <div class="field"><label>Category</label>
-          <select id="r-cat">
-            <option value="liturgical">Liturgical supplies</option>
-            <option value="travel">Travel</option>
-            <option value="office">Office / admin</option>
-            <option value="pastoral">Pastoral care</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="field"><label>Notes (optional)</label><input type="text" id="r-notes" placeholder="e.g. Receipt attached"/></div>
-        <button class="btn btn-primary" onclick="addReimb()">+ Submit reimbursement</button>
-        <button class="btn btn-secondary" onclick="exportReimbCSV()">↓ Export CSV</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Reimbursement log</div>
         <div id="reimb-log"><div class="empty">Loading…</div></div>
       </div>
+
+      <!-- PART II — CHURCH MILEAGE -->
+      <div class="card">
+        <div class="card-title">Part II — Church mileage</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Trips reimbursed by the church (separate from your tax mileage)</div>
+        <div class="base-row">
+          <span>🏠</span>
+          <select id="rbase-select" onchange="selectReimbBase()" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-size:14px;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23888%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;"></select>
+          <button class="base-edit" onclick="editAddresses()">✎ Edit</button>
+        </div>
+        <div class="field"><label>Date</label><input type="date" id="rm-date"/></div>
+        <div class="field"><label>Purpose</label>
+          <select id="rm-purpose">
+            <option value="anointing">Anointing of the sick</option>
+            <option value="pastoral">Pastoral visit</option>
+            <option value="blessing">House blessing</option>
+            <option value="deanery">Deanery meeting</option>
+            <option value="diocesan">Diocesan events</option>
+          </select>
+        </div>
+        <div class="field"><label>Destination address</label>
+          <div class="autocomplete-wrap">
+            <input type="text" id="rm-to" placeholder="e.g. UCHealth, St Joseph Church…" onfocus="showReimbSuggestions()" onblur="hideReimbSuggestions()" autocomplete="off"/>
+            <div class="autocomplete-list" id="rm-autocomplete-list" style="display:none;"></div>
+          </div>
+        </div>
+        <div id="rm-dist-info" class="dist-info"></div>
+        <div class="miles-calc-row">
+          <div class="field"><label>Miles (round trip)</label><input type="number" id="rm-miles" placeholder="or enter manually" min="0" step="0.1" inputmode="decimal"/></div>
+          <button class="btn-calc" id="rm-calc-btn" onclick="calcReimbDistance()">📍 Calculate</button>
+        </div>
+        <button class="btn btn-primary" onclick="addReimbMile()">+ Add trip</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Part II log</div>
+        <div id="reimb-mile-log"><div class="empty">Loading…</div></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -516,7 +577,7 @@ const RATE=0.70;
 const SA_EMAIL='parish-app@parish-mileage.iam.gserviceaccount.com';
 const SA_KEY=`-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDq0vbNExEec4X1\n3saLfxrFsc7OiR2de1clvRCN+mGAMKPeIPBFl/E7NSYTRRYk4wx5VS/NpHXzJ7fd\nPNGoHSNczj55yRh6LrNmHdOtSPD+3D5sJVFlj5jhnDgBBtyAteXYiZ7vLd4NMFx6\nPx8alCWJiS6bPooDUT2TevPMLDVPG0BGGuZWZGmMYmQlmfyhDvPkx+CfDyhNHkwu\nC2A+yHK+RYnK4diYI1lWTROvuzlNRfUBna/A86+HN8csvVduPcnbBEQWCfi0KO+n\n6UQ7s4GWnDcbLxTG4oqjS60CLPxTqFtnu9NtEaGjAdC2xUnF3JQVSdrGUai9bUcU\ny+I0aHrTAgMBAAECggEAJ2MQS3B9yBZHa2ic88vzgSJkVkcwZPhJs0ZFjxLmpLpD\n2h+7PWkRaMVu5/+ICdLdhkJwHLWPpSPN1rl7Tw/oHQpo90NwLBpGNAQfu6qG5bCq\ndbhCsV7HHVx3FlEAzkP0VAAtXN/cJWktscGBpZMgwrN0UkzImGrZgbG3T9FAdc6B\nlnMCN+2XQXBLnKS4ldWvbE5i5mS/peV5I0mrg+E8OujW/Zvm8viXaIWL7S3Z3sQ0\nCMHC1JGYrC6jKKILc4bx8LX8//WeQbDrRyQbKzhtplXNxW3um3LOWNLxPKvl2BnY\nRPrbH4NMlYDsaBSGrR2rTFuZ4HaQtfzepj8Cjd54DQKBgQD2kgEOWORfCZzFfKyk\n6m8W+JU/U4/w7eXfiw7re0dXeBgokMBG2N3cD2LI1v80oasZiO50UfM0Y5tykWbw\nAtN0nMGzKlLJyqT6ef9v0XJz1JkHsrld68RUboKd/1ujDVSurFLTwQA+BwrRcBqw\nJrg8mecAF0fyEh8p71lTPrGBJQKBgQDzzfXwv1vkkrBDT842Sv1oRS0kCtIuVSUv\n6s0Rgaletu1rgpuWr/JUHJzM/V9i/If2l4j3iiV+HRIsrw7n76OKzalJh9/i/unh\ni7ALIruIEzuHjMwFYFG4IVsflATi1DJXEasQ65/U47159dhJTr3cuiO/kArK2/EG\nroVAj8G2lwKBgASev75RFBZjy7g3mdSNP/+iMMm6+xt8ma4SoPjwmmmdKna4H6I0\nNhQFhchVnvqRfO9BjZZIYtI8e5EuAEvHAcdRmJ+Oz3ZQgb7fwlWKCyb4eNWYF7kW\nzdr3JyNmwYTQnyGWwQaOuz5uS1mZTCa40wLvr1BlH0f95u+WOIpCxnixAoGAF+P4\n06yMvqs5Jn9tf5h9mHge4kdFLVEeocFqcuq3xBY80aoswOlg36kmHFg/vp1sXVeg\nDlG1NtR2cXZ+CXBMIE/i5Nexsra0CGv9xjmTEtR/otrDK0uy9k4edcu1ZtzQSgPr\nNW9BbEUczhSvKw/SPwzmb+EXjaVbywHTAO6VVuUCgYB8+selzOZu+mnwg3xuidR1\nCIvAhhoG59eCRTNGrf/iPpDk8hLbChjiVzIIL+55d9bdYpiz5s7OxHS/hCBuyPby\n4dd4qC3Kj9/MgP2JApTUVaYqbQqyGzcPtNZB7y33cGR5aruqNRazV0GVjcWVYFZb\nIwSmeIKF1qVMkfEGKDNOIg==\n-----END PRIVATE KEY-----\n`;
 
-let trips=[],intentions=[],reimbs=[],stoles=[];
+let trips=[],intentions=[],reimbs=[],reimb_miles=[],stoles=[];
 let mileFilter='all',intFilter='upcoming',stoleFilter='all',mileSort='newest';
 let accessToken=null,tokenExpiry=0;
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
@@ -652,19 +713,22 @@ async function sheetsClearRow(sheetName,rowIndex){
 async function loadAll(){
   setSyncBadge('syncing');
   try{
-    const [tr,it,re,st]=await Promise.all([
+    const results=await Promise.all([
       sheetsGet('Mileage!A2:G'),
       sheetsGet('Intentions!A2:F'),
       sheetsGet('Reimbursements!A2:G'),
-      sheetsGet('StoleFees!A2:F')
+      sheetsGet('StoleFees!A2:F'),
+      sheetsGet('ReimbMileage!A2:G')
     ]);
+    const [tr,it,re,st,rmData]=results;
     trips=(tr||[]).map((r,i)=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'other',miles:parseFloat(r[4])||0,notes:r[6]||'',rowIndex:i+2})).reverse();
     intentions=(it||[]).map((r,i)=>({date:r[0]||'',time:r[1]||'',type:r[2]||'living',name:r[3]||'',requestor:r[4]||'',status:r[5]||'pending',rowIndex:i+2})).reverse();
-    reimbs=(re||[]).map(r=>({date:r[0]||'',desc:r[1]||'',category:r[2]||'other',amount:parseFloat(r[3])||0,status:r[4]||'pending',notes:r[5]||''})).reverse();
+    reimbs=(re||[]).map(r=>({date:r[0]||'',payee:r[1]||'',purpose:r[2]||'',amount:parseFloat(r[3])||0,notes:r[4]||''})).reverse();
     stoles=(st||[]).map(r=>({date:r[0]||'',type:r[1]||'other',amount:parseFloat(r[2])||0,from:r[3]||'',checknum:r[4]||'',notes:r[5]||''})).reverse();
+    reimb_miles=(rmData||[]).map(r=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'',miles:parseFloat(r[4])||0})).reverse();
     setSyncBadge('ok');
-    renderTrips();renderIntentions();renderReimbs();renderStoles();
-    updateMileMetrics();updateReimbMetrics();updateStoleMetrics();
+    renderTrips();renderIntentions();renderReimbs();renderReimbMiles();renderStoles();
+    updateMileMetrics();updateReimbMetrics();updateStoleMetrics();renderReimbBaseSelect();
     renderCalendar();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Could not load data — check connection','err');}
 }
@@ -678,8 +742,12 @@ function updateHomeCards(){
   document.getElementById('hb-intentions').textContent=todayInts?`${todayInts} intention${todayInts>1?'s':''} today`:'No intentions today';
   const stoleTotal=stoles.filter(s=>s.date.startsWith(year)).reduce((s,r)=>s+r.amount,0);
   document.getElementById('hb-stole').textContent='$'+stoleTotal.toFixed(0)+' this year';
-  const pending=reimbs.filter(r=>r.status==='pending').reduce((s,r)=>s+r.amount,0);
-  document.getElementById('hb-reimb').textContent=pending>0?'$'+pending.toFixed(0)+' pending':'No pending';
+  const now2=new Date();
+  const mp=`${now2.getFullYear()}-${String(now2.getMonth()+1).padStart(2,'0')}`;
+  const monthExpTotal=reimbs.filter(r=>r.date.startsWith(mp)).reduce((s,r)=>s+r.amount,0);
+  const monthRMTotal=reimb_miles.filter(t=>t.date.startsWith(mp)).reduce((s,t)=>s+parseFloat(t.miles)*RATE,0);
+  const grandMonthTotal=monthExpTotal+monthRMTotal;
+  document.getElementById('hb-reimb').textContent=grandMonthTotal>0?'$'+grandMonthTotal.toFixed(0)+' this month':'Nothing this month';
 }
 
 // ADDRESSES
@@ -773,6 +841,7 @@ function hideSuggestions(){
 // Init Places once Maps API is ready
 function onMapsReady(){
   initPlacesAutocomplete();
+  initReimbPlacesAutocomplete();
 }
 
 // MILEAGE
@@ -1184,37 +1253,282 @@ async function readCheck(event){
 }
 
 // REIMBURSEMENTS
+// ── REIMBURSEMENTS — PART I (EXPENSES) ───────────────────────────────────────
+let reimbBase='Parish house';
+function selectReimbBase(){
+  const idx=document.getElementById('rbase-select').value;
+  reimbBase=savedAddresses[idx].address||savedAddresses[idx].label;
+}
+function renderReimbBaseSelect(){
+  const sel=document.getElementById('rbase-select');
+  if(!sel)return;
+  sel.innerHTML=savedAddresses.map((a,i)=>`<option value="${i}">${a.label}${a.address?' — '+a.address.split(',')[0]:' (tap Edit)'}</option>`).join('');
+  const idx=parseInt(localStorage.getItem('parish_base_idx')||'0');
+  sel.value=idx<savedAddresses.length?idx:0;
+  reimbBase=savedAddresses[sel.value].address||savedAddresses[sel.value].label;
+}
+
 async function addReimb(){
-  const desc=document.getElementById('r-desc').value.trim();
-  const amt=parseFloat(document.getElementById('r-amt').value);
   const date=document.getElementById('r-date').value;
-  const cat=document.getElementById('r-cat').value;
-  const notes=document.getElementById('r-notes').value.trim();
-  if(!desc||isNaN(amt)||amt<=0||!date){alert('Please fill in description, amount and date.');return;}
+  const payee=document.getElementById('r-payee').value.trim();
+  const purpose=document.getElementById('r-purpose').value.trim();
+  const amt=parseFloat(document.getElementById('r-amt').value);
+  if(!date||!payee||isNaN(amt)||amt<=0){alert('Please fill in date, payee and amount.');return;}
   setSyncBadge('syncing');
   try{
-    await sheetsAppend('Reimbursements!A:G',[[date,desc,cat,amt.toFixed(2),'pending',notes,'']]);
-    reimbs.unshift({date,desc,category:cat,amount:amt,status:'pending',notes});
-    document.getElementById('r-desc').value='';document.getElementById('r-amt').value='';document.getElementById('r-notes').value='';
-    setSyncBadge('ok');toast('Reimbursement saved ✓');
+    await sheetsAppend('Reimbursements!A:E',[[date,payee,purpose,amt.toFixed(2),'']]);
+    reimbs.unshift({date,payee,purpose,amount:amt,notes:''});
+    document.getElementById('r-payee').value='';
+    document.getElementById('r-purpose').value='';
+    document.getElementById('r-amt').value='';
+    setSyncBadge('ok');toast('Expense saved ✓');
     renderReimbs();updateReimbMetrics();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
 function renderReimbs(){
   const el=document.getElementById('reimb-log');
-  if(!reimbs.length){el.innerHTML='<div class="empty">No reimbursements yet.</div>';return;}
-  el.innerHTML=reimbs.map(r=>`<div class="reimb-item"><div class="item-top"><div class="item-title">${r.desc}</div><span class="item-amount">$${parseFloat(r.amount).toFixed(2)}</span></div><div class="item-meta"><span class="item-date">${fmtDate(r.date)}</span><span class="item-date">· ${reimbCats[r.category]||r.category}</span><span class="badge status-${r.status}">${r.status}</span>${r.notes?`<span class="item-date">· ${r.notes}</span>`:''}</div></div>`).join('');
+  if(!reimbs.length){el.innerHTML='<div class="empty">No expenses yet.</div>';return;}
+  el.innerHTML=reimbs.map(r=>`<div class="reimb-item">
+    <div class="item-top">
+      <div class="item-title">${r.payee||r.desc||''}${r.purpose?' — '+r.purpose:''}</div>
+      <span class="item-amount">$${parseFloat(r.amount).toFixed(2)}</span>
+    </div>
+    <div class="item-meta"><span class="item-date">${fmtDate(r.date)}</span></div>
+  </div>`).join('');
 }
+
+// ── REIMBURSEMENTS — PART II (CHURCH MILEAGE) ────────────────────────────────
+function showReimbSuggestions(){
+  const input=document.getElementById('rm-to');
+  const list=document.getElementById('rm-autocomplete-list');
+  if(input.value.trim().length>0){list.style.display='none';return;}
+  const saved=getSavedDestinations().slice(0,5);
+  if(!saved.length){list.style.display='none';return;}
+  list.innerHTML='<div style="padding:8px 14px 4px;font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;">Recent</div>'+
+    saved.map(d=>`<div class="autocomplete-item" onmousedown="pickReimbSuggestion('${d.replace(/'/g,"\'").replace(/"/g,'&quot;')}')"><span class="autocomplete-icon">🕐</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d}</span></div>`).join('');
+  list.style.display='block';
+}
+function pickReimbSuggestion(val){
+  document.getElementById('rm-to').value=val;
+  document.getElementById('rm-autocomplete-list').style.display='none';
+}
+function hideReimbSuggestions(){
+  setTimeout(()=>{
+    const list=document.getElementById('rm-autocomplete-list');
+    if(list)list.style.display='none';
+  },250);
+}
+function initReimbPlacesAutocomplete(){
+  const input=document.getElementById('rm-to');
+  if(!input||typeof google==='undefined'||!google.maps||!google.maps.places)return;
+  const ac=new google.maps.places.Autocomplete(input,{
+    types:['establishment','geocode'],fields:['formatted_address','name']
+  });
+  ac.addListener('place_changed',()=>{
+    const place=ac.getPlace();
+    if(place&&place.formatted_address){
+      input.value=place.formatted_address;
+      saveDestination(place.formatted_address);
+    }
+  });
+}
+
+function calcReimbDistance(){
+  const to=document.getElementById('rm-to').value.trim();
+  if(!to){alert('Enter a destination first.');return;}
+  if(!reimbBase||reimbBase==='Parish house'){alert('Please set your starting address first.');return;}
+  const btn=document.getElementById('rm-calc-btn');
+  btn.disabled=true;btn.textContent='Calculating…';
+  if(typeof google==='undefined'||!google.maps){
+    toast('Maps not loaded yet','err');btn.disabled=false;btn.textContent='📍 Calculate';return;
+  }
+  const svc=new google.maps.DistanceMatrixService();
+  svc.getDistanceMatrix({
+    origins:[reimbBase],destinations:[to],
+    travelMode:google.maps.TravelMode.DRIVING,
+    unitSystem:google.maps.UnitSystem.IMPERIAL
+  },function(resp,status){
+    btn.disabled=false;btn.textContent='📍 Calculate';
+    if(status==='OK'&&resp.rows[0].elements[0].status==='OK'){
+      const ow=resp.rows[0].elements[0].distance.value/1609.344,rt=ow*2;
+      document.getElementById('rm-miles').value=rt.toFixed(1);
+      const info=document.getElementById('rm-dist-info');
+      info.style.display='block';
+      info.textContent=`One way: ${ow.toFixed(1)} mi · Round trip: ${rt.toFixed(1)} mi`;
+    }else toast('Address not found','err');
+  });
+}
+
+async function addReimbMile(){
+  const date=document.getElementById('rm-date').value;
+  const to=document.getElementById('rm-to').value.trim();
+  const purpose=document.getElementById('rm-purpose').value;
+  const miles=parseFloat(document.getElementById('rm-miles').value);
+  if(!date||!to||isNaN(miles)||miles<=0){alert('Please fill in date, destination and miles.');return;}
+  setSyncBadge('syncing');
+  try{
+    await sheetsAppend('ReimbMileage!A:G',[[date,reimbBase,to,purposeLabels[purpose]||purpose,miles.toFixed(1),(miles*RATE).toFixed(2),'']]);
+    reimb_miles.unshift({date,from:reimbBase,to,purpose,miles});
+    document.getElementById('rm-to').value='';
+    document.getElementById('rm-miles').value='';
+    document.getElementById('rm-dist-info').style.display='none';
+    saveDestination(to);
+    setSyncBadge('ok');toast('Church trip saved ✓');
+    renderReimbMiles();updateReimbMetrics();updateHomeCards();
+  }catch(e){setSyncBadge('error');toast('Save failed','err');}
+}
+
+function renderReimbMiles(){
+  const el=document.getElementById('reimb-mile-log');
+  if(!el)return;
+  if(!reimb_miles.length){el.innerHTML='<div class="empty">No church trips yet.</div>';return;}
+  el.innerHTML=reimb_miles.map(t=>`<div class="trip-item">
+    <div class="item-top">
+      <div class="item-title">${t.from} → ${t.to}</div>
+      <span class="item-amount">$${(parseFloat(t.miles)*RATE).toFixed(2)}</span>
+    </div>
+    <div class="item-meta">
+      <span class="item-date">${fmtDate(t.date)}</span>
+      <span class="badge b-pastoral">${purposeLabels[t.purpose]||t.purpose}</span>
+      <span class="item-date">${parseFloat(t.miles).toFixed(1)} mi</span>
+    </div>
+  </div>`).join('');
+}
+
 function updateReimbMetrics(){
-  const year=new Date().getFullYear().toString();
-  document.getElementById('r-pending').textContent='$'+reimbs.filter(r=>r.status==='pending').reduce((s,r)=>s+r.amount,0).toFixed(2);
-  document.getElementById('r-approved').textContent='$'+reimbs.filter(r=>r.status==='approved'&&r.date.startsWith(year)).reduce((s,r)=>s+r.amount,0).toFixed(2);
+  const now=new Date();
+  const prefix=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthExp=reimbs.filter(r=>r.date.startsWith(prefix)).reduce((s,r)=>s+r.amount,0);
+  const monthMiles=reimb_miles.filter(t=>t.date.startsWith(prefix)).reduce((s,t)=>s+parseFloat(t.miles),0);
+  const monthMileAmt=monthMiles*RATE;
+  document.getElementById('r-exp-total').textContent='$'+monthExp.toFixed(2);
+  document.getElementById('r-mile-total').textContent='$'+monthMileAmt.toFixed(2);
+  document.getElementById('r-grand-total').textContent='$'+(monthExp+monthMileAmt).toFixed(2);
+  document.getElementById('r-mile-count').textContent=monthMiles.toFixed(1)+' mi';
 }
+
 function exportReimbCSV(){
-  const rows=[['Date','Description','Category','Amount ($)','Status','Notes']];
-  reimbs.forEach(r=>rows.push([r.date,r.desc,reimbCats[r.category]||r.category,parseFloat(r.amount).toFixed(2),r.status,r.notes||'']));
-  downloadCSV(rows,'reimbursements.csv');
+  const rows=[['Date','Who paid?','Purpose','Amount ($)']];
+  reimbs.forEach(r=>rows.push([r.date,r.payee||'',r.purpose||'',parseFloat(r.amount).toFixed(2)]));
+  downloadCSV(rows,'expenses.csv');
 }
+
+// OLV FORM GENERATOR
+const OLV_TEMPLATE_B64 = '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LVlmS5bZkmW2ZJktWWZLltmSZbZkmS1ZZkuW2ZJltmSZLVlmS5bZkmW2ZJktWWZLltmSZbZkmS1ZZkuW2ZJltmSZLVlmS5bZkmW2ZJktOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC05ZkuO2ZJjtuSYLTlmS47ZkmO25JgtOWZLjtmSY7bkmC15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLXlmS57Zkme25JkteWZLntmSZ7bkmS15Zkue2ZJntuSZLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2FJgtBWZLgdlSYLYUmC0FZkuB2VJgthSYLQVmS4HZUmC2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mtlSM1tqZkvNbKmZLTWzpWa21MyWmtlSM1tqZkvNbKmZLTWzpWa21MyWmtlSM1tqZkvNbKmZLTWzpYZ3s+HtbHg/m97QZlXxlja8pw1vasO72vC2NrOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW2pmS81sqZktNbOlZrbUzJaa2VIzW+pmS91sqZstdbOlbrbUzZa62VI3W+pmS91sqZstdbOlbrbUzZa62VI3W+pmS91sqZstdbOlbrbUzZa62VI3W+pmS91sqZstdbOlbrbUzZa62VI3W+pmS91sqZstdbOlbrbUzZa62VLHNZNw0SRcNQmXTdJ1k6wqrpyESyfh2km4eJLZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZL3Wypmy11s6VuttTNlrrZUjdb6mZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xpmC0Ns6VhtjTMlobZ0jBbGmZLw2xp4MrcuDQ3rs2Ni3Pj6ty6PLdVxQW6cYVuXKLbbGmYLQ2zpWG2NMyWhtnSMFsaZkvDbGmYLQ2zpWG2NMyWhtnSMFsaZkvDbGmYLQ2zpWG2NMyWhtnSMFsaZkvDbGmYLQ2zpWG2NMyWhtnSMFsaZkvDbGmYLQ2zpWG2NMyWhtnSMFsaZkvDbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NM2WptnSNFuaZkvTbGmaLU2zpWm2NPH5b/gAOHwCHD4CDp8Bhw+B06fAWVV8Dhw+CM5saZotTbOlabY0zZam2dI0W5pmS9NsaZotTbOlabY0zZam2dI0W5pmS9NsaZotTbOlabY0zZam2dI0W5pmS9NsaZotTbOlabY0zZam2dI0WwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFsKs6UwWwqzpTBbCrOlMFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbSrOlNFtKs6U0W0qzpTRbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6VltrTMlpbZ0jJbWmZLy2xpmS0ts6Wy+T9x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';
+
+function getMonthExpenses(month, year){
+  const prefix=`${year}-${String(month).padStart(2,'0')}`;
+  return reimbs.filter(r=>r.date.startsWith(prefix));
+}
+function getMonthReimbMileage(month, year){
+  const prefix=`${year}-${String(month).padStart(2,'0')}`;
+  return reimb_miles.filter(t=>t.date.startsWith(prefix));
+}
+
+// Update preview when month/year changes
+function updateGenPreview(){
+  const month=parseInt(document.getElementById('gen-month').value);
+  const year=parseInt(document.getElementById('gen-year').value);
+  const exps=getMonthExpenses(month,year);
+  const miles=getMonthReimbMileage(month,year);
+  const totalExp=exps.reduce((s,r)=>s+r.amount,0);
+  const totalMiles=miles.reduce((s,t)=>s+parseFloat(t.miles),0);
+  const preview=document.getElementById('gen-preview');
+  if(!exps.length&&!miles.length){
+    preview.style.display='none';return;
+  }
+  preview.style.display='block';
+  preview.innerHTML=`<strong>${exps.length} expense${exps.length!==1?'s':''}</strong> totalling $${totalExp.toFixed(2)} &nbsp;·&nbsp; <strong>${miles.length} trip${miles.length!==1?'s':''}</strong> totalling ${totalMiles.toFixed(1)} miles ($${(totalMiles*RATE).toFixed(2)})`;
+}
+
+async function generateOLVForm(){
+  const month=parseInt(document.getElementById('gen-month').value);
+  const year=parseInt(document.getElementById('gen-year').value);
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthLabel=`${monthNames[month-1]} ${year}`;
+  const exps=getMonthExpenses(month,year);
+  const miles=getMonthReimbMileage(month,year);
+
+  if(!exps.length&&!miles.length){
+    alert(`No expenses or mileage logged for ${monthLabel}.`);return;
+  }
+
+  try{
+    // Decode base64 template
+    const binaryStr=atob(OLV_TEMPLATE_B64);
+    const bytes=new Uint8Array(binaryStr.length);
+    for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+
+    const wb=XLSX.read(bytes,{type:'array',cellStyles:true,cellFormula:true});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+
+    // Helper to set cell value preserving style
+    function setCell(ref, value, numFmt){
+      if(!ws[ref]) ws[ref]={t:'s'};
+      if(typeof value==='number'){
+        ws[ref].t='n';ws[ref].v=value;ws[ref].w=String(value);
+        if(numFmt) ws[ref].z=numFmt;
+      } else {
+        ws[ref].t='s';ws[ref].v=value||'';ws[ref].w=value||'';
+      }
+    }
+
+    // Fill month/date
+    setCell('E3', monthLabel);
+    setCell('K3', monthLabel);
+
+    // Part I — Expenses (rows 6–20, max 15)
+    exps.slice(0,15).forEach((exp,i)=>{
+      const r=6+i;
+      setCell(`A${r}`, exp.date);
+      setCell(`B${r}`, exp.desc);
+      setCell(`C${r}`, exp.notes||reimbCats[exp.category]||exp.category);
+      setCell(`D${r}`, '');
+      setCell(`E${r}`, '');
+      setCell(`F${r}`, exp.amount, '$#,##0.00');
+    });
+
+    // Part II — Mileage (rows 6–20, max 15)
+    miles.slice(0,15).forEach((trip,i)=>{
+      const r=6+i;
+      setCell(`H${r}`, trip.date);
+      setCell(`I${r}`, trip.from);
+      setCell(`J${r}`, trip.to);
+      setCell(`K${r}`, purposeLabels[trip.purpose]||trip.purpose||'');
+      setCell(`L${r}`, parseFloat(trip.miles), '0.0');
+    });
+
+    // Recalculate totals manually (since browser can't run Excel formulas)
+    const totalExpAmt=exps.slice(0,15).reduce((s,r)=>s+r.amount,0);
+    const totalMilesNum=miles.slice(0,15).reduce((s,t)=>s+parseFloat(t.miles),0);
+    const mileageReimb=totalMilesNum*RATE;
+    const grandTotal=totalExpAmt+mileageReimb;
+
+    setCell('F22', totalExpAmt, '$#,##0.00');
+    setCell('L21', totalMilesNum, '0.0');
+    setCell('L23', mileageReimb, '$#,##0.00');
+    setCell('F23', mileageReimb, '$#,##0.00');
+    setCell('F24', grandTotal, '$#,##0.00');
+    setCell('F26', grandTotal, '$#,##0.00');
+
+    // Download
+    const filename=`OLV_Reimbursement_${monthNames[month-1]}_${year}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    toast(`${filename} downloaded ✓`);
+
+  }catch(e){
+    console.error(e);
+    toast('Could not generate form — try again','err');
+  }
+}
+
+// Watch for month/year changes
+document.addEventListener('DOMContentLoaded',()=>{
+  const m=document.getElementById('gen-month');
+  const y=document.getElementById('gen-year');
+  if(m) m.addEventListener('change',updateGenPreview);
+  if(y) y.addEventListener('change',updateGenPreview);
+});
 
 // CSV
 function downloadCSV(rows,filename){
@@ -1230,7 +1544,9 @@ function initApp(){
   document.getElementById('i-date').value=TODAY;
   document.getElementById('s-date').value=TODAY;
   document.getElementById('r-date').value=TODAY;
+  document.getElementById('rm-date').value=TODAY;
   renderBaseSelect();
+  renderReimbBaseSelect();
   loadAll();
 }
 
@@ -1245,6 +1561,7 @@ function initApp(){
   if(checkPinLock())showLockTimer();
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU&libraries=places&callback=onMapsReady" async defer></script>
 </body>
 </html>
