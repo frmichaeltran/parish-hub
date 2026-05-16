@@ -22,7 +22,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #pin-screen{position:fixed;inset:0;z-index:9999;background:#1a1433;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
 #pin-screen.hidden{display:none;}
 .pin-cross{font-size:44px;margin-bottom:8px;}
-.pin-quote{font-family:'Lora',serif;font-size:22px;color:#fff;font-weight:400;font-style:italic;text-align:center;line-height:1.5;margin-bottom:44px;opacity:0.9;}
+.pin-quote{font-family:'Lora',serif;font-size:15px;color:#fff;font-weight:400;font-style:italic;text-align:center;line-height:1.5;margin-bottom:44px;opacity:0.75;white-space:nowrap;}
 .pin-dots{display:flex;gap:16px;margin-bottom:44px;}
 .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:transparent;transition:all 0.15s;}
 .pin-dot.filled{background:#fff;border-color:#fff;}
@@ -39,27 +39,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #app.visible{display:block;}
 
 /* HOME */
-#page-home{min-height:100vh;background:linear-gradient(180deg,#1a1433 0%,#2d2660 45%,#f0eef8 45%);}
-.home-header{padding:52px 24px 24px;}
-.home-cross{font-size:28px;margin-bottom:10px;}
-.home-quote{font-family:'Lora',serif;font-size:20px;color:#fff;font-weight:400;font-style:italic;line-height:1.55;opacity:0.92;}
-.home-date{font-size:12px;color:rgba(255,255,255,0.35);margin-top:10px;}
-.home-list{display:flex;flex-direction:column;gap:14px;padding:20px 16px 32px;}
-.home-btn{background:#fff;border-radius:20px;border:none;padding:0;display:flex;flex-direction:row;align-items:stretch;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.10);overflow:hidden;min-height:100px;}
+#page-home{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.85) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 15%, rgba(255,255,255,0.9) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 60%, rgba(255,255,255,0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 70%, rgba(255,255,255,0.7) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(255,255,255,0.75) 0%, transparent 45%),
+    linear-gradient(180deg, #87CEEB 0%, #B0D9F0 40%, #D4EAF7 70%, #E8F4FB 100%);
+}
+.home-header{padding:52px 20px 16px;}
+.home-date{font-family:'Lora',serif;font-size:26px;font-weight:600;color:#1a3a5c;line-height:1.2;margin-bottom:6px;text-shadow:0 1px 3px rgba(255,255,255,0.8);}
+.home-quote{font-family:'Lora',serif;font-size:13px;color:rgba(26,58,92,0.65);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.home-list{display:flex;flex-direction:column;gap:16px;padding:20px 16px 36px;}
+.home-btn{background:rgba(255,255,255,0.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:24px;border:1px solid rgba(255,255,255,0.9);padding:0;display:flex;flex-direction:row;align-items:stretch;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 6px 24px rgba(100,150,200,0.18);overflow:hidden;min-height:120px;}
 .home-btn:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(0,0,0,0.10);}
-.home-btn-icon-area{width:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:40px;}
-.home-btn:nth-child(1) .home-btn-icon-area{background:linear-gradient(135deg,#FEF3C7,#FDE68A);}
-.home-btn:nth-child(2) .home-btn-icon-area{background:linear-gradient(135deg,#E0E7FF,#C7D2FE);}
-.home-btn:nth-child(3) .home-btn-icon-area{background:linear-gradient(135deg,#D1FAE5,#A7F3D0);}
-.home-btn:nth-child(4) .home-btn-icon-area{background:linear-gradient(135deg,#DBEAFE,#BFDBFE);}
-.home-btn-text{flex:1;padding:18px 16px;display:flex;flex-direction:column;justify-content:center;text-align:left;}
-.home-btn-title{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:4px;}
-.home-btn-sub{font-size:12px;color:var(--muted);line-height:1.4;}
-.home-btn-arrow{padding:18px 14px 18px 0;display:flex;align-items:center;font-size:20px;color:#ccc;}
-.sync-row{display:flex;align-items:center;justify-content:center;padding:0 16px 24px;}
-.sync-pill{font-size:11px;padding:5px 14px;border-radius:20px;background:var(--teal-light);color:var(--teal);font-weight:500;}
-.sync-pill.syncing{background:var(--amber-light);color:var(--amber);}
-.sync-pill.error{background:var(--red-light);color:var(--red);}
+.home-btn-icon-area{width:110px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:46px;}
+.home-btn:nth-child(1) .home-btn-icon-area{background:linear-gradient(135deg,rgba(254,243,199,0.9),rgba(253,230,138,0.9));}
+.home-btn:nth-child(2) .home-btn-icon-area{background:linear-gradient(135deg,rgba(224,231,255,0.9),rgba(199,210,254,0.9));}
+.home-btn:nth-child(3) .home-btn-icon-area{background:linear-gradient(135deg,rgba(209,250,229,0.9),rgba(167,243,208,0.9));}
+.home-btn:nth-child(4) .home-btn-icon-area{background:linear-gradient(135deg,rgba(219,234,254,0.9),rgba(191,219,254,0.9));}
+.home-btn-text{flex:1;padding:20px 16px;display:flex;flex-direction:column;justify-content:center;text-align:left;}
+.home-btn-title{font-family:'Lora',serif;font-size:19px;font-weight:600;color:#1a2a3a;line-height:1.2;margin-bottom:5px;}
+.home-btn-sub{font-size:13px;color:#5a7a9a;line-height:1.4;}
+.home-btn-arrow{padding:20px 16px 20px 0;display:flex;align-items:center;font-size:22px;color:#a0b8c8;}
+.sync-row{display:flex;align-items:center;justify-content:center;padding:0 16px 28px;}
+.sync-pill{font-size:11px;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,0.7);color:#1a6e56;font-weight:500;border:1px solid rgba(255,255,255,0.9);}
+.sync-pill.syncing{background:rgba(255,255,255,0.7);color:var(--amber);}
+.sync-pill.error{background:rgba(255,255,255,0.7);color:var(--red);}
 
 /* INNER PAGES */
 .inner-page{display:none;min-height:100vh;padding-bottom:40px;}
@@ -184,8 +192,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <!-- PIN -->
 <div id="pin-screen">
-  <div class="pin-cross">✝</div>
-  <div class="pin-quote">Iesus Christus<br>Dominus meus<br>et Deus meus</div>
+  <div class="pin-quote">Iesus Christus · Dominus meus · et Deus meus</div>
   <div class="pin-dots">
     <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
     <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
@@ -215,9 +222,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <!-- HOME -->
   <div id="page-home">
     <div class="home-header">
-      <div class="home-cross">✝</div>
-      <div class="home-quote">Iesus Christus<br>Dominus meus<br>et Deus meus</div>
       <div class="home-date" id="home-date"></div>
+      <div class="home-quote">Iesus Christus · Dominus meus · et Deus meus</div>
     </div>
     <div class="home-list">
       <div class="home-btn" onclick="openPage('mileage')">
@@ -237,7 +243,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="home-btn-arrow">›</div>
       </div>
       <div class="home-btn" onclick="openPage('stole')">
-        <div class="home-btn-icon-area">💵</div>
+        <div class="home-btn-icon-area">✉️</div>
         <div class="home-btn-text">
           <div class="home-btn-title">Stole fees</div>
           <div class="home-btn-sub" id="hb-stole">Outside income</div>
