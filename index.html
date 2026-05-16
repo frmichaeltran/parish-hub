@@ -392,7 +392,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-title">Record stole fee</div>
         <div class="field"><label>Type</label>
           <select id="s-type">
-            <option value="stipend">Mass stipend</option>
+            <option value="mass">Mass / Penance service</option>
             <option value="funeral">Funeral</option>
             <option value="wedding">Wedding</option>
             <option value="baptism">Baptism</option>
@@ -414,7 +414,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-title">Fee log</div>
         <div class="filter-row">
           <button class="fbtn active" onclick="setStoleFilter('all',this)">All</button>
-          <button class="fbtn" onclick="setStoleFilter('stipend',this)">Stipends</button>
+          <button class="fbtn" onclick="setStoleFilter('mass',this)">Mass/Penance</button>
           <button class="fbtn" onclick="setStoleFilter('funeral',this)">Funerals</button>
           <button class="fbtn" onclick="setStoleFilter('wedding',this)">Weddings</button>
           <button class="fbtn" onclick="setStoleFilter('baptism',this)">Baptisms</button>
@@ -565,7 +565,7 @@ let selectedCalDate=null;
 const TODAY=new Date().toISOString().split('T')[0];
 const purposeLabels={anointing:'Anointing of sick',blessing:'House blessing',diocesan:'Diocesan meeting/event',mass:'Mass/Penance service'};
 const purposeClass={anointing:'b-hospital',blessing:'b-school',diocesan:'b-admin',mass:'b-pastoral'};
-const stoleLabels={stipend:'Mass stipend',funeral:'Funeral',wedding:'Wedding',baptism:'Baptism',blessing:'Blessing/Other'};
+const stoleLabels={mass:'Mass/Penance service',funeral:'Funeral',wedding:'Wedding',baptism:'Baptism',blessing:'Blessing/Other'};
 const reimbCats={liturgical:'Liturgical',travel:'Travel',office:'Office',pastoral:'Pastoral care',other:'Other'};
 
 // PIN
