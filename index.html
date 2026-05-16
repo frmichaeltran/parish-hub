@@ -128,14 +128,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .status-approved{background:var(--teal-light);color:var(--teal);}
 .empty{text-align:center;padding:32px 0;color:var(--muted);font-size:14px;}
 
-/* CHECK SCAN */
-.scan-box{margin-bottom:14px;}
-.btn-scan{width:100%;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--purple-mid);background:var(--purple-light);color:var(--purple);font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0;}
-.btn-scan:active{opacity:0.75;}
-.scan-status{margin-top:10px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;background:var(--amber-light);color:var(--amber);display:flex;align-items:center;gap:8px;}
-.scan-status.done{background:var(--teal-light);color:var(--teal);}
-.scan-status.error{background:var(--red-light);color:var(--red);}
-
 /* SORT BTN */
 .sort-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap;}
 .sort-btn.active{background:var(--purple-light);border-color:var(--purple-mid);color:var(--purple);}
@@ -400,15 +392,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div class="card">
         <div class="card-title">Record stole fee</div>
-        <!-- Camera scan button -->
-        <div class="scan-box" id="scan-box">
-          <input type="file" id="check-photo" accept="image/*" capture="environment" style="display:none;" onchange="readCheck(event)"/>
-          <button class="btn btn-scan" onclick="document.getElementById('check-photo').click()">
-            📷 Scan a check
-          </button>
-          <div id="scan-status" class="scan-status" style="display:none;"></div>
-        </div>
-
         <div class="field"><label>Type</label>
           <select id="s-type">
             <option value="stipend">Mass stipend</option>
