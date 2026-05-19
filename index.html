@@ -905,7 +905,15 @@ function onMapsReady(){
 }
 
 // MILEAGE
-function fmtDate(d){if(!d)return '';const[y,m,day]=d.split('-');return `${m}/${day}/${y.slice(2)}`;}
+function fmtDate(d){
+  if(!d)return '';
+  // Already MM/DD/YYYY
+  if(String(d).includes('/'))return String(d);
+  // YYYY-MM-DD
+  const parts=String(d).split('-');
+  if(parts.length===3)return `${parts[1]}/${parts[2]}/${parts[0].slice(2)}`;
+  return String(d);
+}
 
 function calcDistance(){
   const to=document.getElementById('f-to').value.trim();
