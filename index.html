@@ -735,7 +735,7 @@ async function loadAll(){
     reimb_miles=(rmData||[]).map(r=>({date:r[0]||'',from:r[1]||'',to:r[2]||'',purpose:r[3]||'',miles:parseFloat(r[4])||0})).reverse();
     setSyncBadge('ok');
     renderTrips();renderIntentions();renderReimbs();renderReimbMiles();renderStoles();
-    updateMileMetrics();updateReimbMetrics();updateStoleMetrics();renderReimbBaseSelect();
+    updateMileMetrics();updateReimbMetrics();updateStoleMetrics();renderReimbBaseSelect();updateGenPreview();
     renderCalendar();updateHomeCards();
   }catch(e){setSyncBadge('error');toast('Could not load data — check connection','err');}
 }
@@ -1345,7 +1345,7 @@ async function addReimb(){
     document.getElementById('r-purpose').value='';
     document.getElementById('r-amt').value='';
     setSyncBadge('ok');toast('Expense saved ✓');
-    renderReimbs();updateReimbMetrics();updateHomeCards();
+    renderReimbs();updateReimbMetrics();updateHomeCards();updateGenPreview();
   }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
 function renderReimbs(){
@@ -1439,7 +1439,7 @@ async function addReimbMile(){
     document.getElementById('rm-dist-info').style.display='none';
     saveDestination(to);
     setSyncBadge('ok');toast('Church trip saved ✓');
-    renderReimbMiles();updateReimbMetrics();updateHomeCards();
+    renderReimbMiles();updateReimbMetrics();updateHomeCards();updateGenPreview();
   }catch(e){setSyncBadge('error');toast('Save failed','err');}
 }
 
