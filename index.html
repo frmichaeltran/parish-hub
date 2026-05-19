@@ -500,7 +500,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
         <div id="gen-preview" style="font-size:12px;color:#534AB7;margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;display:none;line-height:1.6;"></div>
-        <button class="btn" style="background:#534AB7;color:#fff;margin-bottom:0;" onclick="generateOLVForm()">📄 Generate &amp; Download OLV Form</button>
+        <button class="btn" style="background:#534AB7;color:#fff;margin-bottom:0;" onclick="generateOLVForm()">📄 Generate PDF for printing</button>
       </div>
 
       <!-- PART I — EXPENSES -->
@@ -1489,13 +1489,25 @@ function exportReimbCSV(){
 // OLV FORM GENERATOR
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMcSJekztWqtm3b0TUvhcrkou1u08LxunIYuiuvel-y6o_eSa4pGsad8W9xK7bi_Br1g/exec';
 
+function dateMatchesMonth(dateVal, month, year){
+  if(!dateVal) return false;
+  const s = String(dateVal);
+  // YYYY-MM-DD format
+  if(s.match(/^\d{4}-\d{2}-\d{2}/)){
+    return s.startsWith(`${year}-${String(month).padStart(2,'0')}`);
+  }
+  // M/D/YYYY or MM/DD/YYYY format
+  const parts = s.split('/');
+  if(parts.length === 3){
+    return parseInt(parts[0])===month && parseInt(parts[2])===year;
+  }
+  return false;
+}
 function getMonthExpenses(month, year){
-  const prefix=`${year}-${String(month).padStart(2,'0')}`;
-  return reimbs.filter(r=>r.date.startsWith(prefix));
+  return reimbs.filter(r=>dateMatchesMonth(r.date, month, year));
 }
 function getMonthReimbMileage(month, year){
-  const prefix=`${year}-${String(month).padStart(2,'0')}`;
-  return reimb_miles.filter(t=>t.date.startsWith(prefix));
+  return reimb_miles.filter(t=>dateMatchesMonth(t.date, month, year));
 }
 function updateGenPreview(){
   const month=parseInt(document.getElementById('gen-month').value);
@@ -1545,7 +1557,8 @@ async function generateOLVForm(){
     const arr=new Uint8Array(buf);
     for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
     
-    const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const mimeType=data.filename.endsWith('.pdf')?'application/pdf':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    const blob=new Blob([buf],{type:mimeType});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download=data.filename;
