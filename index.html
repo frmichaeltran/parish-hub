@@ -1551,15 +1551,32 @@ async function generateOLVForm(){
       throw new Error(data.error||'Unknown error');
     }
 
-    // Convert base64 to blob and download
-    const raw=atob(data.data);
-    const buf=new ArrayBuffer(raw.length);
-    const arr=new Uint8Array(buf);
-    for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
-    const blob=new Blob([buf],{type:'application/pdf'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=data.filename;
+    // Merge two PDFs using pdf-lib
+    function b64toBytes(b64){
+      const raw=atob(b64);
+      const arr=new Uint8Array(raw.length);
+      for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
+      return arr;
+    }
+
+    const {PDFDocument} = PDFLib;
+    const merged = await PDFDocument.create();
+
+    // Copy page from PDF 1
+    const doc1 = await PDFDocument.load(b64toBytes(data.pdf1));
+    const [p1] = await merged.copyPages(doc1, [0]);
+    merged.addPage(p1);
+
+    // Copy page from PDF 2
+    const doc2 = await PDFDocument.load(b64toBytes(data.pdf2));
+    const [p2] = await merged.copyPages(doc2, [0]);
+    merged.addPage(p2);
+
+    const mergedBytes = await merged.save();
+    const blob = new Blob([mergedBytes], {type:'application/pdf'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = data.filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1607,6 +1624,7 @@ function initApp(){
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqHJvVpUBlR_COZrfcmKRdWh6mZQEC1UU&libraries=places&callback=onMapsReady" async defer></script>
 </body>
 </html>
