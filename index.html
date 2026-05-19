@@ -1551,14 +1551,12 @@ async function generateOLVForm(){
       throw new Error(data.error||'Unknown error');
     }
 
-    // Convert base64 to binary properly
+    // Convert base64 to blob and download
     const raw=atob(data.data);
     const buf=new ArrayBuffer(raw.length);
     const arr=new Uint8Array(buf);
     for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
-    
-    const mimeType=data.filename.endsWith('.pdf')?'application/pdf':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-    const blob=new Blob([buf],{type:mimeType});
+    const blob=new Blob([buf],{type:'application/pdf'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download=data.filename;
