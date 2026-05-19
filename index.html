@@ -1528,26 +1528,36 @@ async function generateOLVForm(){
 
   try{
     const url=`${APPS_SCRIPT_URL}?month=${month}&year=${year}`;
-    const resp=await fetch(url);
-    const data=await resp.json();
+    const resp=await fetch(url, {redirect:'follow'});
+    const text=await resp.text();
+    
+    // Parse JSON — handle any BOM or whitespace
+    const clean=text.trim().replace(/^﻿/,'');
+    const data=JSON.parse(clean);
 
     if(!data.success){
       throw new Error(data.error||'Unknown error');
     }
 
-    // Decode base64 and download
-    const bytes=Uint8Array.from(atob(data.data),c=>c.charCodeAt(0));
-    const blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    // Convert base64 to binary properly
+    const raw=atob(data.data);
+    const buf=new ArrayBuffer(raw.length);
+    const arr=new Uint8Array(buf);
+    for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
+    
+    const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download=data.filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     toast(`${data.filename} downloaded ✓`);
 
   }catch(e){
-    console.error(e);
+    console.error('Generate error:',e);
     toast('Could not generate form — try again','err');
-    alert('Error: '+e.message+'. Make sure the template file is in your Google Drive.');
+    alert('Error: '+e.message);
   }
 
   btn.textContent='📄 Generate & Download OLV Form';
